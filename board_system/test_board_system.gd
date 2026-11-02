@@ -169,6 +169,27 @@ func _init() -> void:
 	assert(test_slot._can_drop_data(Vector2.ZERO, {"type": "card", "card_data": wildcard_card}), "Drag-drop must respect custom affinity validator for Wildcard")
 	print("Drag-and-drop validation & custom validator (N2/N3) verified.")
 
+	# 12. Test Universal Spatial Topology Protocol (N7)
+	var u0 = {"name": "Unit0"}
+	var u1 = {"name": "Unit1"}
+	var u2 = {"name": "Unit2"}
+	var opp_u1 = {"name": "OppUnit1"}
+	grid_inst.get_slot(0, 0).slot_data.primary_occupant = u0
+	grid_inst.get_slot(0, 1).slot_data.primary_occupant = u1
+	grid_inst.get_slot(0, 2).slot_data.primary_occupant = u2
+	grid_inst.get_slot(1, 1).slot_data.primary_occupant = opp_u1
+
+	var adj_to_u1 = grid_inst.get_adjacent_units(u1)
+	assert(adj_to_u1.size() == 2, "Adjacent units to lane 1 should be exactly 2 units (lanes 0 and 2)")
+	assert(u0 in adj_to_u1 and u2 in adj_to_u1, "Adjacent units must contain Unit0 and Unit2")
+
+	var opp_to_u1 = grid_inst.get_opposing_units(u1)
+	assert(opp_to_u1.size() == 1 and opp_to_u1[0] == opp_u1, "Opposing unit to Unit1 must be OppUnit1")
+
+	var in_radius_u1 = grid_inst.get_units_in_radius(u1, 1)
+	assert(in_radius_u1.size() == 2, "Units within radius 1 should be Unit0 and Unit2")
+	print("Universal Spatial Topology Protocol (N7) verified on BoardGrid.")
+
 	grid_inst.free()
 	print("==================================================")
 	print("ALL BOARD & LANE SYSTEM UNIT TESTS PASSED (100%)")

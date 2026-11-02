@@ -216,6 +216,41 @@ func _init() -> void:
 	resolver.resolve_all_sync()
 	print("Target shape mismatch handling (N6) verified.")
 
+	# 14. Test Universal Spatial Topology Protocol on Hex Mock (N7)
+	var hex_dragon = {"name": "Dragon", "side": 0}
+	var hex_neighbor_1 = {"name": "HexGoblin1", "side": 0}
+	var hex_neighbor_2 = {"name": "HexGoblin2", "side": 0}
+	var hex_neighbor_3 = {"name": "HexGoblin3", "side": 0}
+	var hex_opposing = {"name": "HexBoss", "side": 1}
+
+	var mock_board = RefCounted.new()
+	# Add script with protocol methods
+	var mock_script = GDScript.new()
+	mock_script.source_code = """
+extends RefCounted
+var adj = []
+var opp = []
+func get_adjacent_units(_origin): return adj
+func get_opposing_units(_origin): return opp
+"""
+	mock_script.reload()
+	mock_board.set_script(mock_script)
+	mock_board.adj = [hex_neighbor_1, hex_neighbor_2, hex_neighbor_3]
+	mock_board.opp = [hex_opposing]
+
+	# Create context with 3D axial/cube coordinate Vector3i(1, -1, 0)
+	var hex_ctx = EffectContext.create(hex_dragon, 0, 0, [], "", Vector3i(1, -1, 0))
+	assert(hex_ctx.get_coordinate() == Vector3i(1, -1, 0), "Context should store and return Vector3i hex coordinate")
+	hex_ctx.set_var("board", mock_board)
+
+	var resolved_hex_adj = resolver._resolve_targets(EffectData.TargetScope.ADJACENT_FRIENDLY, hex_ctx)
+	assert(resolved_hex_adj.size() == 3, "Hex board protocol must resolve 3 adjacent hex units (not 2 lane units)")
+	assert(hex_neighbor_1 in resolved_hex_adj, "Hex neighbor 1 resolved")
+
+	var resolved_hex_opp = resolver._resolve_targets(EffectData.TargetScope.OPPOSING_LANE, hex_ctx)
+	assert(resolved_hex_opp.size() == 1 and resolved_hex_opp[0]["name"] == "HexBoss", "Hex board protocol must resolve HexBoss")
+	print("Universal Spatial Topology Protocol with Hex Mock (N7) verified.")
+
 	resolver.free()
 
 	print("==================================================")

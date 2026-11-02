@@ -142,6 +142,71 @@ func get_opposing_slot(slot: BoardSlot) -> BoardSlot:
 	return null
 
 
+## Universal Spatial Topology Protocol: returns adjacent units to an origin slot, unit, or coordinate
+func get_adjacent_units(origin: Variant) -> Array:
+	var origin_slot: BoardSlot = _resolve_slot_from_origin(origin)
+	if origin_slot == null or origin_slot.slot_data == null:
+		return []
+
+	var side = origin_slot.slot_data.side
+	var lane = origin_slot.slot_data.lane_index
+	var result: Array = []
+	for offset in [-1, 1]:
+		var adj = get_slot(side, lane + offset)
+		if adj != null and adj.slot_data and not adj.slot_data.is_empty():
+			result.append(adj.slot_data.primary_occupant if adj.slot_data.has_primary() else adj)
+	return result
+
+
+## Universal Spatial Topology Protocol: returns opposing / facing units
+func get_opposing_units(origin: Variant) -> Array:
+	var origin_slot: BoardSlot = _resolve_slot_from_origin(origin)
+	if origin_slot == null:
+		return []
+
+	var opp = get_opposing_slot(origin_slot)
+	if opp != null and opp.slot_data and not opp.slot_data.is_empty():
+		return [opp.slot_data.primary_occupant if opp.slot_data.has_primary() else opp]
+	return []
+
+
+## Universal Spatial Topology Protocol: returns units within radius
+func get_units_in_radius(origin: Variant, radius: int = 1) -> Array:
+	var origin_slot: BoardSlot = _resolve_slot_from_origin(origin)
+	if origin_slot == null or origin_slot.slot_data == null:
+		return []
+
+	var side = origin_slot.slot_data.side
+	var lane = origin_slot.slot_data.lane_index
+	var result: Array = []
+	for l in range(max(0, lane - radius), min(lanes_per_side, lane + radius + 1)):
+		if l == lane:
+			continue
+		var s = get_slot(side, l)
+		if s != null and s.slot_data and not s.slot_data.is_empty():
+			result.append(s.slot_data.primary_occupant if s.slot_data.has_primary() else s)
+	return result
+
+
+func _resolve_slot_from_origin(origin: Variant) -> BoardSlot:
+	if origin is BoardSlot:
+		return origin
+	if origin is Object and "slot_data" in origin and origin.slot_data is SlotData:
+		return get_slot(origin.slot_data.side, origin.slot_data.lane_index)
+	if origin is Vector2i:
+		return get_slot(origin.x, origin.y)
+	if origin is Dictionary:
+		if origin.has("side") and origin.has("lane"):
+			return get_slot(int(origin["side"]), int(origin["lane"]))
+		if origin.has("side") and origin.has("lane_index"):
+			return get_slot(int(origin["side"]), int(origin["lane_index"]))
+	# Search occupants
+	for s in _slots_map.values():
+		if s.slot_data and s.slot_data.primary_occupant == origin:
+			return s
+	return null
+
+
 ## Retrieve all slots matching criteria
 func get_all_slots(side: int = -1) -> Array[BoardSlot]:
 	var result: Array[BoardSlot] = []

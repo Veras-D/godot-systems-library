@@ -19,10 +19,10 @@ enum EffectType {
 enum TargetScope {
 	SELF,                # The entity casting or triggering the ability
 	TARGET_SINGLE,       # A single chosen target
-	ALL_FRIENDLY,        # All friendly units on the caster's side
-	ALL_ENEMY,           # All enemy units on the opposing side
-	ADJACENT_FRIENDLY,   # Left and right neighboring units
-	OPPOSING_LANE,       # The directly opposite enemy lane
+	ALL_FRIENDLY,        # All friendly units on the caster's side/team
+	ALL_ENEMY,           # All enemy units on opposing sides/teams
+	ADJACENT_FRIENDLY,   # Neighboring friendly units (2 in lanes, up to 6 in hex grids)
+	OPPOSING_LANE,       # The directly opposite / facing enemy unit
 	RANDOM_ENEMY,        # N random enemy targets
 	ALL_UNITS            # Every unit on the board
 }

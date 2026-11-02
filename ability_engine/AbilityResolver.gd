@@ -188,17 +188,25 @@ func _resolve_targets(scope: EffectData.TargetScope, context: EffectContext) -> 
 			return context.targets.duplicate()
 
 		EffectData.TargetScope.ADJACENT_FRIENDLY:
-			# Left and right neighboring units on same side
-			var grid = context.get_var("board_grid", context.get_var("board"))
-			if grid != null and grid.has_method("get_slot"):
+			# 1. Universal Spatial Topology Protocol on board
+			var board = context.get_var("board", context.get_var("board_grid"))
+			if board != null and board.has_method("get_adjacent_units"):
+				var origin = context.source if context.source != null else context.get_coordinate()
+				var adj_units = board.get_adjacent_units(origin)
+				var filtered: Array = []
+				for u in adj_units:
+					if _get_entity_side(u, context.source_side) == context.source_side:
+						filtered.append(u)
+				return filtered
+			elif board != null and board.has_method("get_slot"):
 				var adj_units: Array = []
 				for lane_offset in [-1, 1]:
-					var adj_slot = grid.get_slot(context.source_side, context.source_lane + lane_offset)
+					var adj_slot = board.get_slot(context.source_side, context.source_lane + lane_offset)
 					if adj_slot != null and adj_slot.slot_data and not adj_slot.slot_data.is_empty():
 						adj_units.append(adj_slot.slot_data.primary_occupant if adj_slot.slot_data.has_primary() else adj_slot)
 				return adj_units
 
-			# Candidate pool filtering
+			# 2. Candidate pool filtering
 			var adj_matched: Array = []
 			for t in context.targets:
 				if _get_entity_side(t, context.source_side) == context.source_side:
@@ -207,21 +215,24 @@ func _resolve_targets(scope: EffectData.TargetScope, context: EffectContext) -> 
 			return adj_matched
 
 		EffectData.TargetScope.OPPOSING_LANE:
-			# The enemy unit in the opposing slot
-			var grid = context.get_var("board_grid", context.get_var("board"))
-			if grid != null and grid.has_method("get_opposing_slot"):
-				var cur_slot = grid.get_slot(context.source_side, context.source_lane)
+			# 1. Universal Spatial Topology Protocol on board
+			var board = context.get_var("board", context.get_var("board_grid"))
+			if board != null and board.has_method("get_opposing_units"):
+				var origin = context.source if context.source != null else context.get_coordinate()
+				return board.get_opposing_units(origin)
+			elif board != null and board.has_method("get_opposing_slot"):
+				var cur_slot = board.get_slot(context.source_side, context.source_lane)
 				if cur_slot != null:
-					var opp_slot = grid.get_opposing_slot(cur_slot)
+					var opp_slot = board.get_opposing_slot(cur_slot)
 					if opp_slot != null and opp_slot.slot_data and not opp_slot.slot_data.is_empty():
 						return [opp_slot.slot_data.primary_occupant if opp_slot.slot_data.has_primary() else opp_slot]
-			elif grid != null and grid.has_method("get_slot"):
-				var opp_side = 1 - context.source_side if grid.get("sides_count") == 2 else (context.source_side + 1)
-				var opp_slot = grid.get_slot(opp_side, context.source_lane)
+			elif board != null and board.has_method("get_slot"):
+				var opp_side = 1 - context.source_side if board.get("sides_count") == 2 else (context.source_side + 1)
+				var opp_slot = board.get_slot(opp_side, context.source_lane)
 				if opp_slot != null and opp_slot.slot_data and not opp_slot.slot_data.is_empty():
 					return [opp_slot.slot_data.primary_occupant if opp_slot.slot_data.has_primary() else opp_slot]
 
-			# Candidate pool filtering
+			# 2. Candidate pool filtering
 			for t in context.targets:
 				if _get_entity_side(t, -1) != context.source_side and _get_entity_lane(t) == context.source_lane:
 					return [t]
