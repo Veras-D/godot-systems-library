@@ -2,4 +2,7 @@
 .godot/
 *.translation
 *.import
-# Keep imported metadata only if needed, but standard is ignore .godot/
+
+# Agent / Tooling files
+.agents/
+
