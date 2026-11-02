@@ -1,0 +1,5 @@
+# Godot 4 .gitignore
+.godot/
+*.translation
+*.import
+# Keep imported metadata only if needed, but standard is ignore .godot/

@@ -1,0 +1,211 @@
+[gd_scene format=3 uid="uid://c83k4m7p8w2x1"]
+
+[ext_resource type="Script" path="res://timing_wheel/TestbedWheel.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://timing_wheel/WheelSpinner.tscn" id="2_wheel"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
+bg_color = Color(0.07, 0.08, 0.12, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.12, 0.14, 0.20, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.25, 0.35, 0.5, 0.6)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="TestbedWheel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
+
+[node name="Header" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 16.0
+offset_bottom = 70.0
+grow_horizontal = 2
+theme_override_constants/separation = 4
+
+[node name="Title" type="Label" parent="Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 24
+text = "🎡 Timing Wheel System - Standalone Testbed"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.8, 0.9, 0.8)
+theme_override_font_sizes/font_size = 13
+text = "Reusable, Decoupled Roulette & Reaction Minigame Module"
+horizontal_alignment = 1
+
+[node name="HBox" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = 80.0
+offset_right = -40.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 30
+
+[node name="WheelArea" type="VBoxContainer" parent="HBox"]
+custom_minimum_size = Vector2(480, 0)
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="WheelSpinner" parent="HBox/WheelArea" instance=ExtResource("2_wheel")]
+layout_mode = 2
+
+[node name="StatusLabel" type="Label" parent="HBox/WheelArea"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.95)
+theme_override_font_sizes/font_size = 15
+text = "Ready to spin!"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="BtnBox" type="HBoxContainer" parent="HBox/WheelArea"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="SpinBtn" type="Button" parent="HBox/WheelArea/BtnBox"]
+custom_minimum_size = Vector2(180, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "⚡ SPIN (Space)"
+
+[node name="StopBtn" type="Button" parent="HBox/WheelArea/BtnBox"]
+custom_minimum_size = Vector2(180, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+disabled = true
+text = "🛑 STOP NEEDLE"
+
+[node name="ControlPanel" type="Panel" parent="HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="VBox" type="VBoxContainer" parent="HBox/ControlPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 16.0
+offset_right = -20.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="PresetLabel" type="Label" parent="HBox/ControlPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "Configuration Preset:"
+
+[node name="PresetOption" type="OptionButton" parent="HBox/ControlPanel/VBox"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+
+[node name="HitValLabel" type="Label" parent="HBox/ControlPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 12
+text = "Hit Area: 80.0%"
+
+[node name="HitSlider" type="HSlider" parent="HBox/ControlPanel/VBox"]
+layout_mode = 2
+min_value = 10.0
+max_value = 90.0
+value = 80.0
+
+[node name="CritValLabel" type="Label" parent="HBox/ControlPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 1, 0.4, 1)
+theme_override_font_sizes/font_size = 12
+text = "Crit Area: 7.0%"
+
+[node name="CritSlider" type="HSlider" parent="HBox/ControlPanel/VBox"]
+layout_mode = 2
+min_value = 1.0
+max_value = 25.0
+value = 7.0
+
+[node name="MissValLabel" type="Label" parent="HBox/ControlPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.3, 0.3, 1)
+theme_override_font_sizes/font_size = 12
+text = "Miss/Defend Area: 13.0%"
+
+[node name="SpeedValLabel" type="Label" parent="HBox/ControlPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Rotation Speed: 1600 deg/s"
+
+[node name="SpeedSlider" type="HSlider" parent="HBox/ControlPanel/VBox"]
+layout_mode = 2
+min_value = 500.0
+max_value = 3500.0
+step = 50.0
+value = 1600.0
+
+[node name="QuickResolveCheck" type="CheckBox" parent="HBox/ControlPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "⚡ Quick Resolve Mode (Deterministic Instant Roll)"
+
+[node name="BatchHBox" type="HBoxContainer" parent="HBox/ControlPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BatchBtn" type="Button" parent="HBox/ControlPanel/VBox"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "📊 Run 1,000 Spin Simulation"
+
+[node name="BatchResultsLabel" type="Label" parent="HBox/ControlPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.9, 1, 0.9)
+theme_override_font_sizes/font_size = 11
+text = "Run simulation to verify empirical probability distribution."
+
+[node name="LogLabel" type="Label" parent="HBox/ControlPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Spin History Log:"
+
+[node name="LogText" type="RichTextLabel" parent="HBox/ControlPanel/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/normal_font_size = 11
+bbcode_enabled = true
+scroll_following = true
