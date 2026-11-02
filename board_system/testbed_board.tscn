@@ -1,0 +1,210 @@
+[gd_scene load_steps=3 format=3 uid="uid://tbbrd001"]
+
+[ext_resource type="Script" path="TestbedBoard.gd" id="1_script"]
+[ext_resource type="PackedScene" path="BoardGrid.tscn" id="2_grid"]
+
+[node name="TestbedBoard" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.07, 0.09, 0.13, 1)
+
+[node name="Layout" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="MainArea" type="VBoxContainer" parent="Layout"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="Layout/MainArea"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Layout/MainArea/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.85, 0.35, 1)
+theme_override_font_sizes/font_size = 20
+text = "Godot Modular Systems Library — Universal Board & Lane System"
+
+[node name="Subtitle" type="Label" parent="Layout/MainArea/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.6, 0.75, 1)
+theme_override_font_sizes/font_size = 12
+text = "Independent Module: board_system/"
+
+[node name="GridContainer" type="PanelContainer" parent="Layout/MainArea"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BoardGrid" parent="Layout/MainArea/GridContainer" instance=ExtResource("2_grid")]
+layout_mode = 2
+
+[node name="Sidebar" type="PanelContainer" parent="Layout"]
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 2
+
+[node name="Scroll" type="ScrollContainer" parent="Layout/Sidebar"]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="Layout/Sidebar/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="ConfigTitle" type="Label" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "GRID CONFIGURATION"
+
+[node name="ConfigSection" type="HBoxContainer" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+
+[node name="LaneLabel" type="Label" parent="Layout/Sidebar/Scroll/VBox/ConfigSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 12
+text = "Lanes per Side:"
+
+[node name="LaneCountSpin" type="SpinBox" parent="Layout/Sidebar/Scroll/VBox/ConfigSection"]
+layout_mode = 2
+min_value = 2.0
+max_value = 8.0
+value = 4.0
+
+[node name="HSeparator1" type="HSeparator" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+
+[node name="SelectionTitle" type="Label" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "SLOT INSPECTOR"
+
+[node name="SelectionSection" type="PanelContainer" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+
+[node name="SelectedInfo" type="Label" parent="Layout/Sidebar/Scroll/VBox/SelectionSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 11
+text = "No slot selected.\nClick any slot to inspect."
+
+[node name="AffinityBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "🔄 Cycle Slot Affinity"
+
+[node name="HSeparator2" type="HSeparator" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+
+[node name="OccupantTitle" type="Label" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "SUMMON & ATTACH"
+
+[node name="SummonGrassBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "🌿 Summon Unit (Grass)"
+
+[node name="SummonSandBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "🏜️ Summon Unit (Sand)"
+
+[node name="SummonUnivBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "⭐ Summon Unit (Universal)"
+
+[node name="AttachStructBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "🏰 Attach Structure (+2 ATK)"
+
+[node name="RemoveOccupantsBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "❌ Clear Selected Occupants"
+
+[node name="HSeparator3" type="HSeparator" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+
+[node name="CombatTitle" type="Label" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "COMBAT & HIGHLIGHTS"
+
+[node name="ClashBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "⚔️ Simulate Lane Clash"
+
+[node name="ShakeBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "💥 Damage Shake Animation"
+
+[node name="HighlightValidBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "🔍 Highlight 'Grass' on Side 0"
+
+[node name="ClearHighlightsBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "🧹 Clear Highlights"
+
+[node name="ClearAllBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "🗑️ Clear Board Grid"
+
+[node name="SerializeBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "💾 Serialize State to JSON"
+
+[node name="HSeparator4" type="HSeparator" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+
+[node name="LogTitle" type="Label" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "EVENT LOG"
+
+[node name="LogSection" type="PanelContainer" parent="Layout/Sidebar/Scroll/VBox"]
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+
+[node name="EventLog" type="RichTextLabel" parent="Layout/Sidebar/Scroll/VBox/LogSection"]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 10
+scroll_following = true
+
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/AffinityBtn" to="." method="_on_btn_cycle_affinity_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/SummonGrassBtn" to="." method="_on_btn_summon_unit_pressed" binds= ["Grass"]]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/SummonSandBtn" to="." method="_on_btn_summon_unit_pressed" binds= ["Sand"]]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/SummonUnivBtn" to="." method="_on_btn_summon_unit_pressed" binds= ["Universal"]]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/AttachStructBtn" to="." method="_on_btn_attach_structure_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/RemoveOccupantsBtn" to="." method="_on_btn_remove_occupants_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/ClashBtn" to="." method="_on_btn_simulate_clash_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/ShakeBtn" to="." method="_on_btn_shake_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/HighlightValidBtn" to="." method="_on_btn_highlight_test_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/ClearHighlightsBtn" to="." method="_on_btn_clear_highlights_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/ClearAllBtn" to="." method="_on_btn_clear_all_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/SerializeBtn" to="." method="_on_btn_serialize_pressed"]
