@@ -20,6 +20,30 @@ A collection of polished, reusable, completely decoupled game systems and isolat
 
 ---
 
+## 🏷️ Global Type Registry & Reserved Names
+
+This library registers clean, idiomatic GDScript classes (`class_name`) to serve as universal data contracts across your projects. If your project already defines one of these names, you can safely alias it via `const CustomName = preload("path/to/File.gd")` or adopt the library's contracts directly.
+
+| Module | Global `class_name` | Type | Purpose |
+| :--- | :--- | :--- | :--- |
+| **`timing_wheel`** | `WheelConfig` | `Resource` | Roulette sector configuration and hit/crit ratios |
+| | `WheelSpinner` | `Control` | Procedural wheel UI with deceleration physics |
+| **`audio_jukebox`** | `AudioManager` | `Node` | Dual BGM crossfader & zero-allocation SFX pool |
+| **`deck_engine`** | `CardData` | `Resource` | Universal card attributes and metadata model |
+| | `Deck` | `RefCounted` | Draw, discard, banish piles with Fisher-Yates |
+| | `HandManager` | `Control` | Parabolic fan hand positioning with hover kinetics |
+| | `GenericCardView` | `Control` | Themed vector card display component |
+| **`board_system`** | `SlotData` | `Resource` | Slot coordinate, multi-occupant, and affinity model |
+| | `BoardSlot` | `Control` | Visual slot with damage shake and drop handling |
+| | `BoardGrid` | `Control` | Multi-side opposing lane matrix and placement validator |
+| **`ability_engine`** | `EffectData` | `Resource` | Discrete action definition (Damage, Heal, Buff, Draw) |
+| | `EffectContext` | `RefCounted` | Execution context (source, targets, coordinates) |
+| | `AbilityDefinition` | `Resource` | Trigger-to-effects composite container |
+| | `AbilityResolver` | `Node` | Priority FIFO action queue and reaction engine |
+| **`save_vault`** | `SaveVault` | `Node` | Atomic JSON serializer with SHA-256 and `.bak` recovery |
+
+---
+
 ## 🚀 How to Use in Any Godot Project
 
 ### Option A: As a Git Submodule (Recommended)
@@ -55,7 +79,7 @@ This discovers all `test_*.gd` suites, executes them in isolated processes, logs
 ### Open the Interactive Systems Hub in Godot
 This repository is itself a runnable Godot 4 project:
 1. Open Godot 4 and click **Import**.
-2. Select `/home/verivi/Veras/Projects/godot-systems-library/project.godot`.
+2. Select the repository root folder (or `project.godot`).
 3. Press **F5** to run the default testbed, or open any `testbed_*.tscn` inside the system folders to test that system in complete isolation.
 
 ---

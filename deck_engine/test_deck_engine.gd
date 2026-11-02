@@ -3,6 +3,7 @@ extends SceneTree
 const CardData = preload("CardData.gd")
 const Deck = preload("Deck.gd")
 const HandManager = preload("HandManager.gd")
+const HandManagerScene = preload("HandManager.tscn")
 const GenericCardView = preload("GenericCardView.gd")
 
 func _init() -> void:
@@ -49,10 +50,8 @@ func _init() -> void:
 	print("Deck draw, discard, and auto-recycle verified.")
 
 	# 3. Test HandManager & Parabolic Arc Layout
-	var hand_scene = load("res://deck_engine/HandManager.tscn")
-	assert(hand_scene != null, "HandManager scene should load")
-
-	var hand: HandManager = hand_scene.instantiate() as HandManager
+	var hand: HandManager = HandManagerScene.instantiate() as HandManager
+	assert(hand != null, "HandManager should instantiate successfully")
 	root.add_child(hand)
 	hand.custom_minimum_size = Vector2(800, 220)
 

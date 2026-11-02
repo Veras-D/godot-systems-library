@@ -12,7 +12,7 @@ jobs:
     name: Run Godot Systems Test Suite
     runs-on: ubuntu-latest
     container:
-      image: barichello/godot-ci:4.3
+      image: barichello/godot-ci:4.7.2
 
     steps:
       - name: Checkout Code

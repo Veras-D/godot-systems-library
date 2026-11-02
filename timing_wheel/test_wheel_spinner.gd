@@ -2,15 +2,13 @@ extends SceneTree
 
 const WheelConfig = preload("WheelConfig.gd")
 const WheelSpinner = preload("WheelSpinner.gd")
+const WheelSpinnerScene = preload("WheelSpinner.tscn")
 
 func _init() -> void:
 	print("==> Running WheelSpinner Node Lifecycle & Signal Tests...")
 
 	# 1. Instantiate Spinner
-	var scene = load("res://timing_wheel/WheelSpinner.tscn")
-	assert(scene != null, "WheelSpinner.tscn should load successfully")
-
-	var spinner: WheelSpinner = scene.instantiate() as WheelSpinner
+	var spinner: WheelSpinner = WheelSpinnerScene.instantiate() as WheelSpinner
 	assert(spinner != null, "Should instantiate WheelSpinner node")
 	root.add_child(spinner)
 
