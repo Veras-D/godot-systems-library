@@ -9,6 +9,8 @@ signal card_added(card_view: GenericCardView)
 signal card_removed(card_view: GenericCardView)
 signal card_hovered(card_view: GenericCardView)
 signal card_unhovered(card_view: GenericCardView)
+signal card_drawn(card: Variant)
+signal card_played(card: Variant)
 
 @export var card_scene: PackedScene = preload("GenericCardView.tscn")
 @export var max_hand_width: float = 650.0
@@ -44,7 +46,15 @@ func add_card(card_data: CardData) -> GenericCardView:
 
 	update_hand_layout(true)
 	card_added.emit(view)
+	card_drawn.emit(card_data)
 	return view
+
+func play_card(card_view: GenericCardView) -> void:
+	if card_view == null or not card_view in _card_views:
+		return
+	var c_data = card_view.card_data
+	remove_card(card_view)
+	card_played.emit(c_data)
 
 func remove_card(card_view: GenericCardView) -> void:
 	if card_view == null or not card_view in _card_views:

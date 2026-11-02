@@ -17,12 +17,16 @@ signal unit_defeated(unit: Variant, side: int, lane: int)
 
 ## Automatically connects standard event signals to an AbilityResolver instance,
 ## translating game events into ability triggers.
-func connect_resolver(resolver: Node) -> void:
+func connect_resolver(resolver: Object) -> void:
 	if resolver == null or not resolver.has_method("dispatch_trigger"):
 		return
 
 	card_played.connect(func(card: Variant, _side: int, _lane: int):
 		resolver.dispatch_trigger("ON_PLAY", card)
+	)
+
+	card_drawn.connect(func(card: Variant, _side: int):
+		resolver.dispatch_trigger("ON_DRAW", card)
 	)
 
 	unit_summoned.connect(func(unit: Variant, _side: int, _lane: int):
@@ -51,12 +55,28 @@ func bind_board_grid(grid: Node) -> void:
 	if grid == null:
 		return
 
-	if grid.has_signal("slot_dropped"):
-		grid.connect("slot_dropped", func(slot, data):
-			var side = slot.slot_data.side if slot and "slot_data" in slot and slot.slot_data else 0
-			var lane = slot.slot_data.lane_index if slot and "slot_data" in slot and slot.slot_data else 0
-			unit_summoned.emit(data, side, lane)
-		)
+	var on_slot_drop = func(slot, data):
+		var side: int = 0
+		var lane: int = 0
+		if slot != null:
+			if "slot_data" in slot and slot.slot_data != null:
+				side = slot.slot_data.side
+				lane = slot.slot_data.lane_index
+			elif "side" in slot:
+				side = slot.side
+				lane = slot.lane if "lane" in slot else 0
+
+		# Extract unit if data is wrapped in a drag-and-drop dictionary
+		var unit = data
+		if data is Dictionary and data.has("card_data"):
+			unit = data.get("card_data")
+
+		unit_summoned.emit(unit, side, lane)
+
+	if grid.has_signal("occupant_dropped_on_slot"):
+		grid.connect("occupant_dropped_on_slot", on_slot_drop)
+	elif grid.has_signal("slot_dropped"):
+		grid.connect("slot_dropped", on_slot_drop)
 
 	if grid.has_signal("slot_damage_shaken"):
 		grid.connect("slot_damage_shaken", func(slot, intensity):
@@ -69,12 +89,25 @@ func bind_hand_manager(hand: Node, player_side: int = 0) -> void:
 	if hand == null:
 		return
 
+	var unwrap = func(card_or_view: Variant) -> Variant:
+		if card_or_view is Object and "card_data" in card_or_view and card_or_view.card_data != null:
+			return card_or_view.card_data
+		return card_or_view
+
 	if hand.has_signal("card_played"):
 		hand.connect("card_played", func(card):
-			card_played.emit(card, player_side, -1)
+			card_played.emit(unwrap.call(card), player_side, -1)
+		)
+	elif hand.has_signal("card_clicked"):
+		hand.connect("card_clicked", func(card_view):
+			card_played.emit(unwrap.call(card_view), player_side, -1)
 		)
 
 	if hand.has_signal("card_drawn"):
 		hand.connect("card_drawn", func(card):
-			card_drawn.emit(card, player_side)
+			card_drawn.emit(unwrap.call(card), player_side)
+		)
+	elif hand.has_signal("card_added"):
+		hand.connect("card_added", func(card_view):
+			card_drawn.emit(unwrap.call(card_view), player_side)
 		)

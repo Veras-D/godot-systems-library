@@ -113,6 +113,10 @@ event_bus.connect_resolver(resolver)
 # Emitting standard game events automatically dispatches triggers to registered abilities:
 event_bus.damage_dealt.emit(attacker, defender, 6) # Automatically dispatches ON_DAMAGE_TAKEN
 event_bus.unit_defeated.emit(dying_unit, 0, 1)     # Automatically dispatches ON_DEATH (Deathrattles)
+
+# Automatically bridge BoardGrid and HandManager signals directly into the bus:
+event_bus.bind_board_grid(board_grid)
+event_bus.bind_hand_manager(hand_manager, 0) # 0 = player side index
 ```
 
 ---

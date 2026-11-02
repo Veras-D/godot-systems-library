@@ -253,6 +253,80 @@ func get_opposing_units(_origin): return opp
 
 	resolver.free()
 
+	# 15. Regression Test: SystemEventBus Auto-Bridges to Real BoardGrid and HandManager
+	var reg_bus = SystemEventBus.new()
+	var mock_resolver = Node.new()
+	var mock_resolver_script = GDScript.new()
+	mock_resolver_script.source_code = """
+extends Node
+var triggers_fired = []
+func dispatch_trigger(trigger_name: String, source: Variant = null, context: Variant = null) -> void:
+	triggers_fired.append({"trigger": trigger_name, "source": source, "context": context})
+"""
+	mock_resolver_script.reload()
+	mock_resolver.set_script(mock_resolver_script)
+	reg_bus.connect_resolver(mock_resolver)
+
+	# A. Instantiate REAL BoardGrid
+	var board_grid_scene_path = "res://board_system/BoardGrid.tscn"
+	assert(ResourceLoader.exists(board_grid_scene_path), "BoardGrid.tscn must exist")
+	var grid = load(board_grid_scene_path).instantiate()
+	root.add_child(grid)
+	grid.sides_count = 2
+	grid.lanes_per_side = 4
+	grid.rebuild_grid()
+
+	# Bind grid to bus
+	reg_bus.bind_board_grid(grid)
+
+	# Verify real signal: occupant_dropped_on_slot on BoardGrid
+	var test_slot = grid.get_slot(0, 1) # Side 0, Lane 1
+	assert(test_slot != null, "BoardSlot must exist at (0, 1)")
+	var dropped_card_data = {"id": "c_hero", "name": "HeroUnit", "atk": 4, "def": 6}
+
+	# Fire the actual signal emitted by BoardGrid
+	grid.occupant_dropped_on_slot.emit(test_slot, {"type": "card", "card_data": dropped_card_data})
+
+	assert(mock_resolver.triggers_fired.size() == 1, "occupant_dropped_on_slot must trigger dispatch_trigger on resolver")
+	assert(mock_resolver.triggers_fired[0]["trigger"] == "ON_SUMMON", "Trigger must be ON_SUMMON")
+	assert(mock_resolver.triggers_fired[0]["source"]["name"] == "HeroUnit", "Source must be the unwrapped dropped card")
+
+	# Test slot_damage_shaken on BoardGrid
+	grid.slot_damage_shaken.emit(test_slot, 5.0)
+	assert(mock_resolver.triggers_fired.size() == 2, "slot_damage_shaken must trigger dispatch_trigger on resolver")
+	assert(mock_resolver.triggers_fired[1]["trigger"] == "ON_DAMAGE_TAKEN", "Trigger must be ON_DAMAGE_TAKEN")
+	assert(mock_resolver.triggers_fired[1]["source"] == test_slot, "Source must be the shaken slot")
+
+	# B. Instantiate REAL HandManager
+	var hand_manager_scene_path = "res://deck_engine/HandManager.tscn"
+	assert(ResourceLoader.exists(hand_manager_scene_path), "HandManager.tscn must exist")
+	var hand = load(hand_manager_scene_path).instantiate()
+	root.add_child(hand)
+	reg_bus.bind_hand_manager(hand, 0)
+
+	# Add card to real HandManager (fires card_drawn signal)
+	var CardData = load("res://deck_engine/CardData.gd")
+	var drawn_spell = CardData.create("spell_01", "Magic Missile", 2, "Spell", "Arcane", 0, 0)
+	var card_view = hand.add_card(drawn_spell)
+	assert(card_view != null, "CardView must be added to hand")
+
+	assert(mock_resolver.triggers_fired.size() == 3, "HandManager.add_card must trigger ON_DRAW via card_drawn")
+	assert(mock_resolver.triggers_fired[2]["trigger"] == "ON_DRAW", "Trigger must be ON_DRAW")
+	assert(mock_resolver.triggers_fired[2]["source"] == drawn_spell, "Source must be drawn_spell")
+
+	# Play card through real HandManager (fires card_played signal)
+	hand.play_card(card_view)
+	assert(mock_resolver.triggers_fired.size() == 4, "HandManager.play_card must trigger ON_PLAY via card_played")
+	assert(mock_resolver.triggers_fired[3]["trigger"] == "ON_PLAY", "Trigger must be ON_PLAY")
+	assert(mock_resolver.triggers_fired[3]["source"] == drawn_spell, "Source must be drawn_spell")
+
+	# Clean up nodes
+	grid.free()
+	hand.free()
+	mock_resolver.free()
+	reg_bus.free()
+	print("SystemEventBus real BoardGrid and HandManager auto-bridges verified.")
+
 	print("==================================================")
 	print("ALL ABILITY ENGINE UNIT TESTS PASSED (100%)")
 	print("==================================================")
