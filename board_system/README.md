@@ -37,7 +37,10 @@ Designed following the **Systems-First** architecture: zero game-specific coupli
 Instantiate `BoardGrid.tscn` in your battle or board UI:
 
 ```gdscript
+# Example path when included as a submodule in a host project (e.g. res://src/systems/ or res://addons/):
 const BoardGrid = preload("res://src/systems/board_system/BoardGrid.gd")
+# Or if placed directly at your project root:
+# const BoardGrid = preload("res://board_system/BoardGrid.gd")
 
 @onready var board_grid: BoardGrid = $BoardGrid
 

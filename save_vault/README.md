@@ -57,7 +57,10 @@ flowchart TD
 ### 1. Basic Save & Load
 
 ```gdscript
+# Example path when included as a submodule in a host project (e.g. res://src/systems/ or res://addons/):
 const SaveVault = preload("res://src/systems/save_vault/SaveVault.gd")
+# Or if placed directly at your project root:
+# const SaveVault = preload("res://save_vault/SaveVault.gd")
 
 var vault: SaveVault
 

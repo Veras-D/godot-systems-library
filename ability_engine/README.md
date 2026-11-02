@@ -51,8 +51,11 @@ flowchart TD
 ### 1. Defining an Ability
 
 ```gdscript
+# Example path when included as a submodule in a host project (e.g. res://src/systems/ or res://addons/):
 const EffectData = preload("res://src/systems/ability_engine/EffectData.gd")
 const AbilityDefinition = preload("res://src/systems/ability_engine/AbilityDefinition.gd")
+# Or if placed directly at your project root:
+# const EffectData = preload("res://ability_engine/EffectData.gd")
 
 # Create a spell that deals 5 damage to target and heals caster for 3
 var fireball = AbilityDefinition.create(
