@@ -16,7 +16,7 @@ A collection of polished, reusable, completely decoupled game systems and isolat
 | **Deck Engine** | [`deck_engine/`](./deck_engine/) | Universal card model, draw/discard piles, Fisher-Yates shuffle, and parabolic fan hand layout. | ✅ **Production Ready** |
 | **Board System** | [`board_system/`](./board_system/) | Universal lane & grid board slotting, drop target arbitration, and placement affinity. | ✅ **Production Ready** |
 | **Ability Engine** | [`ability_engine/`](./ability_engine/) | Universal trigger/action effect resolver, queue processor, and event bus. | ✅ **Production Ready** |
-| **Save Vault** | `save_vault/` | Secure JSON save state manager, slot backups, and schema migration. | 🚧 *Planned* |
+| **Save Vault** | [`save_vault/`](./save_vault/) | Secure JSON save state manager, atomic writes, slot backups, and schema migration. | ✅ **Production Ready** |
 
 ---
 

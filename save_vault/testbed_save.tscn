@@ -1,0 +1,168 @@
+[gd_scene load_steps=3 format=3 uid="uid://tbsv001"]
+
+[ext_resource type="Script" path="TestbedSave.gd" id="1_script"]
+[ext_resource type="Script" path="SaveVault.gd" id="2_vault"]
+
+[node name="TestbedSave" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="SaveVault" type="Node" parent="."]
+script = ExtResource("2_vault")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.08, 0.12, 1)
+
+[node name="Layout" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="MainArea" type="VBoxContainer" parent="Layout"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="Header" type="HBoxContainer" parent="Layout/MainArea"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Layout/MainArea/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.85, 0.35, 1)
+theme_override_font_sizes/font_size = 20
+text = "Godot Modular Systems Library — Universal Save Vault"
+
+[node name="Subtitle" type="Label" parent="Layout/MainArea/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.6, 0.75, 1)
+theme_override_font_sizes/font_size = 12
+text = "Independent Module: save_vault/"
+
+[node name="SlotControls" type="HBoxContainer" parent="Layout/MainArea"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SlotLabel" type="Label" parent="Layout/MainArea/SlotControls"]
+layout_mode = 2
+text = "Active Save Slot:"
+
+[node name="SlotOption" type="OptionButton" parent="Layout/MainArea/SlotControls"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+
+[node name="SlotInfoPanel" type="PanelContainer" parent="Layout/MainArea"]
+layout_mode = 2
+
+[node name="SlotInfo" type="Label" parent="Layout/MainArea/SlotInfoPanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 12
+text = "Slot info loading..."
+
+[node name="PayloadTitle" type="Label" parent="Layout/MainArea"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.75, 0.85, 1)
+theme_override_font_sizes/font_size = 12
+text = "PAYLOAD JSON EDITOR (Directly editable):"
+
+[node name="PayloadEditor" type="TextEdit" parent="Layout/MainArea"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 12
+
+[node name="Sidebar" type="PanelContainer" parent="Layout"]
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 2
+
+[node name="Scroll" type="ScrollContainer" parent="Layout/Sidebar"]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="Layout/Sidebar/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="ActionTitle" type="Label" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "VAULT ACTIONS"
+
+[node name="SaveBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "💾 Save Active Slot (Atomic)"
+
+[node name="LoadBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "📂 Load Active Slot"
+
+[node name="DeleteBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "🗑️ Delete Active Slot"
+
+[node name="ListBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "📜 List All Saved Slots"
+
+[node name="HSeparator1" type="HSeparator" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+
+[node name="ChaosTitle" type="Label" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = "CHAOS & INTEGRITY TESTS"
+
+[node name="CorruptBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "💥 Corrupt Primary Save"
+
+[node name="MigrateBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "🔄 Test Schema Migration (v1 ➔ v2)"
+
+[node name="HSeparator2" type="HSeparator" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+
+[node name="LogTitle" type="Label" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "EVENT LOG"
+
+[node name="LogSection" type="PanelContainer" parent="Layout/Sidebar/Scroll/VBox"]
+custom_minimum_size = Vector2(0, 220)
+layout_mode = 2
+
+[node name="EventLog" type="RichTextLabel" parent="Layout/Sidebar/Scroll/VBox/LogSection"]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 10
+scroll_following = true
+
+[connection signal="item_selected" from="Layout/MainArea/SlotControls/SlotOption" to="." method="_on_slot_option_item_selected"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/SaveBtn" to="." method="_on_btn_save_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/LoadBtn" to="." method="_on_btn_load_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/DeleteBtn" to="." method="_on_btn_delete_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/ListBtn" to="." method="_on_btn_list_slots_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/CorruptBtn" to="." method="_on_btn_corrupt_primary_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/MigrateBtn" to="." method="_on_btn_test_migration_pressed"]
