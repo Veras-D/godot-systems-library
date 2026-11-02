@@ -1,0 +1,330 @@
+[gd_scene load_steps=5 format=3 uid="uid://tbablt001"]
+
+[ext_resource type="Script" path="TestbedAbilities.gd" id="1_script"]
+[ext_resource type="Script" path="AbilityResolver.gd" id="2_resolver"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_player"]
+bg_color = Color(0.12, 0.18, 0.28, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.6, 0.9, 0.8)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_enemy"]
+bg_color = Color(0.25, 0.12, 0.15, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.9, 0.35, 0.35, 0.8)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="TestbedAbilities" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Resolver" type="Node" parent="."]
+script = ExtResource("2_resolver")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.08, 0.12, 1)
+
+[node name="Layout" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="MainArea" type="VBoxContainer" parent="Layout"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="Header" type="HBoxContainer" parent="Layout/MainArea"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Layout/MainArea/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.85, 0.35, 1)
+theme_override_font_sizes/font_size = 20
+text = "Godot Modular Systems Library — Universal Ability Engine"
+
+[node name="Subtitle" type="Label" parent="Layout/MainArea/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.6, 0.75, 1)
+theme_override_font_sizes/font_size = 12
+text = "Independent Module: ability_engine/"
+
+[node name="Battlefield" type="VBoxContainer" parent="Layout/MainArea"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="EnemySide" type="HBoxContainer" parent="Layout/MainArea/Battlefield"]
+layout_mode = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="BossCard" type="PanelContainer" parent="Layout/MainArea/Battlefield/EnemySide"]
+custom_minimum_size = Vector2(170, 130)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card_enemy")
+
+[node name="VBox" type="VBoxContainer" parent="Layout/MainArea/Battlefield/EnemySide/BossCard"]
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="Name" type="Label" parent="Layout/MainArea/Battlefield/EnemySide/BossCard/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = "😈 Enemy Boss"
+horizontal_alignment = 1
+
+[node name="Stats" type="Label" parent="Layout/MainArea/Battlefield/EnemySide/BossCard/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "HP: 20/20"
+horizontal_alignment = 1
+
+[node name="TargetBtn" type="Button" parent="Layout/MainArea/Battlefield/EnemySide/BossCard/VBox"]
+layout_mode = 2
+text = "Select Target"
+
+[node name="MinionCard" type="PanelContainer" parent="Layout/MainArea/Battlefield/EnemySide"]
+custom_minimum_size = Vector2(170, 130)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card_enemy")
+
+[node name="VBox" type="VBoxContainer" parent="Layout/MainArea/Battlefield/EnemySide/MinionCard"]
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="Name" type="Label" parent="Layout/MainArea/Battlefield/EnemySide/MinionCard/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.55, 0.55, 1)
+theme_override_font_sizes/font_size = 14
+text = "👾 Enemy Minion"
+horizontal_alignment = 1
+
+[node name="Stats" type="Label" parent="Layout/MainArea/Battlefield/EnemySide/MinionCard/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "ATK: 2 | DEF: 5/5"
+horizontal_alignment = 1
+
+[node name="TargetBtn" type="Button" parent="Layout/MainArea/Battlefield/EnemySide/MinionCard/VBox"]
+layout_mode = 2
+text = "Select Target"
+
+[node name="PlayerSide" type="HBoxContainer" parent="Layout/MainArea/Battlefield"]
+layout_mode = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="HeroCard" type="PanelContainer" parent="Layout/MainArea/Battlefield/PlayerSide"]
+custom_minimum_size = Vector2(170, 130)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card_player")
+
+[node name="VBox" type="VBoxContainer" parent="Layout/MainArea/Battlefield/PlayerSide/HeroCard"]
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="Name" type="Label" parent="Layout/MainArea/Battlefield/PlayerSide/HeroCard/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "👑 Player Hero"
+horizontal_alignment = 1
+
+[node name="Stats" type="Label" parent="Layout/MainArea/Battlefield/PlayerSide/HeroCard/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "HP: 25/25\nMana: 3 | Hand: 0"
+horizontal_alignment = 1
+
+[node name="TargetBtn" type="Button" parent="Layout/MainArea/Battlefield/PlayerSide/HeroCard/VBox"]
+layout_mode = 2
+text = "Select Target"
+
+[node name="KnightCard" type="PanelContainer" parent="Layout/MainArea/Battlefield/PlayerSide"]
+custom_minimum_size = Vector2(170, 130)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card_player")
+
+[node name="VBox" type="VBoxContainer" parent="Layout/MainArea/Battlefield/PlayerSide/KnightCard"]
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="Name" type="Label" parent="Layout/MainArea/Battlefield/PlayerSide/KnightCard/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.9, 0.6, 1)
+theme_override_font_sizes/font_size = 14
+text = "🛡️ Knight (Thorns)"
+horizontal_alignment = 1
+
+[node name="Stats" type="Label" parent="Layout/MainArea/Battlefield/PlayerSide/KnightCard/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "ATK: 4 | DEF: 8/8"
+horizontal_alignment = 1
+
+[node name="TargetBtn" type="Button" parent="Layout/MainArea/Battlefield/PlayerSide/KnightCard/VBox"]
+layout_mode = 2
+text = "Select Target"
+
+[node name="Sidebar" type="PanelContainer" parent="Layout"]
+custom_minimum_size = Vector2(340, 0)
+layout_mode = 2
+
+[node name="Scroll" type="ScrollContainer" parent="Layout/Sidebar"]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="Layout/Sidebar/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="QueueTitle" type="Label" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "EFFECT QUEUE"
+
+[node name="QueueSection" type="PanelContainer" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+
+[node name="QueueCountLabel" type="Label" parent="Layout/Sidebar/Scroll/VBox/QueueSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Pending in Queue: 0"
+
+[node name="QueueControls" type="HBoxContainer" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="StepBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox/QueueControls"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "⏩ Step 1"
+
+[node name="ResolveAllBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox/QueueControls"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "▶ Resolve All"
+
+[node name="ResetBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox/QueueControls"]
+layout_mode = 2
+text = "🔄 Reset"
+
+[node name="HSeparator1" type="HSeparator" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+
+[node name="AbilityTitle" type="Label" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "CAST ABILITIES"
+
+[node name="FireballBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "🔥 Fireball (6 DMG to Target)"
+
+[node name="ChainLightningBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "⚡ Chain Lightning (3 DMG All Enemies)"
+
+[node name="DivineHealBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "💚 Divine Heal (4 HP All Friendly)"
+
+[node name="BattleCryBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "⚔️ Battle Cry (+2 ATK to Knight)"
+
+[node name="StatSwapBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "🔄 Stat Swap (Knight ATK ⮂ DEF)"
+
+[node name="ArcaneSurgeBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "💎 Arcane Surge (+2 Mana, +2 Draw)"
+
+[node name="HSeparator2" type="HSeparator" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+
+[node name="ReactionTitle" type="Label" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "REACTIONS"
+
+[node name="EnemyHitKnightBtn" type="Button" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+text = "💥 Enemy Hits Knight (Triggers Thorns)"
+
+[node name="HSeparator3" type="HSeparator" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+
+[node name="LogTitle" type="Label" parent="Layout/Sidebar/Scroll/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "EVENT LOG"
+
+[node name="LogSection" type="PanelContainer" parent="Layout/Sidebar/Scroll/VBox"]
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+
+[node name="EventLog" type="RichTextLabel" parent="Layout/Sidebar/Scroll/VBox/LogSection"]
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 10
+scroll_following = true
+
+[connection signal="pressed" from="Layout/MainArea/Battlefield/EnemySide/BossCard/VBox/TargetBtn" to="." method="_on_target_selected" binds= ["boss"]]
+[connection signal="pressed" from="Layout/MainArea/Battlefield/EnemySide/MinionCard/VBox/TargetBtn" to="." method="_on_target_selected" binds= ["minion"]]
+[connection signal="pressed" from="Layout/MainArea/Battlefield/PlayerSide/HeroCard/VBox/TargetBtn" to="." method="_on_target_selected" binds= ["hero"]]
+[connection signal="pressed" from="Layout/MainArea/Battlefield/PlayerSide/KnightCard/VBox/TargetBtn" to="." method="_on_target_selected" binds= ["knight"]]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/QueueControls/StepBtn" to="." method="_on_btn_step_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/QueueControls/ResolveAllBtn" to="." method="_on_btn_resolve_all_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/QueueControls/ResetBtn" to="." method="_on_btn_reset_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/FireballBtn" to="." method="_on_btn_fireball_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/ChainLightningBtn" to="." method="_on_btn_chain_lightning_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/DivineHealBtn" to="." method="_on_btn_divine_heal_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/BattleCryBtn" to="." method="_on_btn_battle_cry_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/StatSwapBtn" to="." method="_on_btn_stat_swap_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/ArcaneSurgeBtn" to="." method="_on_btn_arcane_surge_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/Scroll/VBox/EnemyHitKnightBtn" to="." method="_on_btn_enemy_hit_knight_pressed"]

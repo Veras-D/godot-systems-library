@@ -15,7 +15,7 @@ A collection of polished, reusable, completely decoupled game systems and isolat
 | **Audio Jukebox** | [`audio_jukebox/`](./audio_jukebox/) | Dual-BGM crossfader, SFX bus player pool with pitch variation, and volume persistence. | ✅ **Production Ready** |
 | **Deck Engine** | [`deck_engine/`](./deck_engine/) | Universal card model, draw/discard piles, Fisher-Yates shuffle, and parabolic fan hand layout. | ✅ **Production Ready** |
 | **Board System** | [`board_system/`](./board_system/) | Universal lane & grid board slotting, drop target arbitration, and placement affinity. | ✅ **Production Ready** |
-| **Ability Engine** | `ability_engine/` | Universal trigger/action effect resolver, queue processor, and event bus. | 🚧 *Planned* |
+| **Ability Engine** | [`ability_engine/`](./ability_engine/) | Universal trigger/action effect resolver, queue processor, and event bus. | ✅ **Production Ready** |
 | **Save Vault** | `save_vault/` | Secure JSON save state manager, slot backups, and schema migration. | 🚧 *Planned* |
 
 ---
