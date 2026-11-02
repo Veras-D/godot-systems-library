@@ -89,6 +89,33 @@ func execute_lane_combat(attacker_slot: BoardSlot) -> void:
         attacker_slot.play_damage_shake(4.0, 0.15)
 ```
 
+### 4. Audio & VFX Animation Signal Hooks
+
+`BoardGrid` bubbles up animation events, allowing audio jukeboxes or screen shake handlers to react without coupling:
+
+```gdscript
+# Connect audio triggers to board animation events:
+board_grid.slot_damage_shaken.connect(func(slot, intensity):
+    Audio.play_sfx(hit_sfx, 0.0, 0.1)
+)
+board_grid.slot_summon_pulsed.connect(func(slot):
+    Audio.play_sfx(summon_sfx)
+)
+```
+
+### 5. Drag-and-Drop Card Contract
+
+`BoardSlot` natively understands the card payload returned by `GenericCardView._get_drag_data()`:
+
+```gdscript
+# Card Drag Payload Schema:
+{
+    "type": "card",
+    "card_data": CardData,
+    "source_view": GenericCardView
+}
+```
+
 ---
 
 ## API Reference

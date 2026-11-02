@@ -51,6 +51,18 @@ func _on_wheel_result(result: Dictionary) -> void:
     print("Final Angle: ", result.angle_deg) # 45.2°
 ```
 
+### 4. Typed Result Contract (`WheelResult`)
+
+In addition to dictionary access, outcomes can be consumed via the typed `WheelConfig.WheelResult` class:
+
+```gdscript
+var outcome: WheelConfig.WheelResult = wheel.get_last_result()
+if outcome.id == WheelConfig.ID_CRIT:
+    print("Critical multiplier: ", outcome.multiplier) # 2.0
+```
+
+Sector ID constants available: `WheelConfig.ID_HIT`, `WheelConfig.ID_CRIT`, `WheelConfig.ID_MISS`.
+
 ---
 
 ## Extracting to Another Godot Project

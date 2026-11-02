@@ -15,6 +15,7 @@ func _init() -> void:
 	assert(card_a.cost == 3, "Card cost should match")
 	assert(card_a.attack == 6, "Card attack should match")
 	assert(card_a.defense == 8, "Card defense should match")
+	assert(card_a.get_affinity() == "Fire", "CardData get_affinity() should return category/faction")
 	print("CardData model verified.")
 
 	# 2. Test Deck Operations

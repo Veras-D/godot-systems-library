@@ -4,6 +4,7 @@ const EffectData = preload("EffectData.gd")
 const EffectContext = preload("EffectContext.gd")
 const AbilityDefinition = preload("AbilityDefinition.gd")
 const AbilityResolver = preload("AbilityResolver.gd")
+const SystemEventBus = preload("SystemEventBus.gd")
 
 func _init() -> void:
 	print("==> Running AbilityEngine Unit Tests...")
@@ -133,6 +134,16 @@ func _init() -> void:
 	resolver.resolve_all_sync()
 	assert(thorn_target["def"] == 5, "Attacker took 3 thorns damage (8 - 3 = 5)")
 	print("Trigger dispatching & reaction ability verified.")
+
+	# 10. Test SystemEventBus Auto-Bridge
+	var bus = SystemEventBus.new()
+	bus.connect_resolver(resolver)
+	# Emit damage_dealt -> should trigger ON_DAMAGE_TAKEN on registered defender
+	bus.damage_dealt.emit(thorn_target, defender_unit, 2)
+	assert(resolver.get_queue_size() == 1, "EventBus damage_dealt should enqueue Thorns reaction")
+	resolver.clear_queue()
+	bus.free()
+	print("SystemEventBus integration verified.")
 
 	resolver.free()
 

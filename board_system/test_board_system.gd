@@ -137,6 +137,18 @@ func _init() -> void:
 	assert(serialized[0].has("affinity"), "Serialized dictionary must contain 'affinity'")
 	print("BoardGrid serialization verified.")
 
+	# 10. Test Animation Signals & Custom Validator
+	var event_box = {"shaken": false}
+	grid_inst.slot_damage_shaken.connect(func(_slot, _intensity): event_box["shaken"] = true)
+	s0_l2.play_damage_shake(10.0, 0.1)
+	assert(event_box["shaken"] == true, "slot_damage_shaken signal must bubble up to BoardGrid")
+
+	grid_inst.custom_affinity_validator = func(card_aff: String, slot_aff: String) -> bool:
+		return card_aff == "Wildcard" or card_aff == slot_aff
+	var val_custom = grid_inst.validate_placement("Wildcard", 0, 0)
+	assert(val_custom.allowed == true, "Custom affinity validator should accept Wildcard")
+	print("Board animation signals & custom validator verified.")
+
 	grid_inst.free()
 	print("==================================================")
 	print("ALL BOARD & LANE SYSTEM UNIT TESTS PASSED (100%)")

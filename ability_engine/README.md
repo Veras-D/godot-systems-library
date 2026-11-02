@@ -100,6 +100,21 @@ resolver.register_trigger_listener(thorns, defender_unit)
 resolver.dispatch_trigger("ON_DAMAGE_TAKEN", defender_unit, reaction_context)
 ```
 
+### 4. Shared Event Bus Integration (`SystemEventBus`)
+
+Connect game events automatically to the ability engine without coupling your gameplay controllers:
+
+```gdscript
+const SystemEventBus = preload("res://src/systems/ability_engine/SystemEventBus.gd")
+
+var event_bus = SystemEventBus.new()
+event_bus.connect_resolver(resolver)
+
+# Emitting standard game events automatically dispatches triggers to registered abilities:
+event_bus.damage_dealt.emit(attacker, defender, 6) # Automatically dispatches ON_DAMAGE_TAKEN
+event_bus.unit_defeated.emit(dying_unit, 0, 1)     # Automatically dispatches ON_DEATH (Deathrattles)
+```
+
 ---
 
 ## API Reference

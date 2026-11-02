@@ -4,6 +4,46 @@ extends RefCounted
 # Universal Wheel Configuration
 # Stores sectors, ratios, colors, multipliers, and rotation kinetics.
 
+const ID_HIT = "hit"
+const ID_CRIT = "crit"
+const ID_MISS = "miss"
+
+## Formal contract for wheel resolution outcomes
+class WheelResult extends RefCounted:
+	const KEY_ID = "id"
+	const KEY_NAME = "name"
+	const KEY_MULTIPLIER = "multiplier"
+	const KEY_ANGLE = "angle_deg"
+	const KEY_COLOR = "color"
+	const KEY_IS_SUCCESS = "is_success"
+
+	var id: String = ID_HIT
+	var name: String = "HIT"
+	var multiplier: float = 1.0
+	var angle_deg: float = 0.0
+	var color: Color = Color.WHITE
+	var is_success: bool = true
+
+	static func from_dict(d: Dictionary) -> WheelResult:
+		var r = WheelResult.new()
+		r.id = d.get(KEY_ID, ID_HIT)
+		r.name = d.get(KEY_NAME, "HIT")
+		r.multiplier = float(d.get(KEY_MULTIPLIER, 1.0))
+		r.angle_deg = float(d.get(KEY_ANGLE, 0.0))
+		r.color = d.get(KEY_COLOR, Color.WHITE)
+		r.is_success = d.get(KEY_IS_SUCCESS, true)
+		return r
+
+	func to_dict() -> Dictionary:
+		return {
+			KEY_ID: id,
+			KEY_NAME: name,
+			KEY_MULTIPLIER: multiplier,
+			KEY_ANGLE: angle_deg,
+			KEY_COLOR: color,
+			KEY_IS_SUCCESS: is_success
+		}
+
 var sectors: Array = []
 var spin_speed_deg_sec: float = 1600.0
 var min_spin_time: float = 0.25

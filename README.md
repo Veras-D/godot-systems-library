@@ -40,6 +40,7 @@ This library registers clean, idiomatic GDScript classes (`class_name`) to serve
 | | `EffectContext` | `RefCounted` | Execution context (source, targets, coordinates) |
 | | `AbilityDefinition` | `Resource` | Trigger-to-effects composite container |
 | | `AbilityResolver` | `Node` | Priority FIFO action queue and reaction engine |
+| | `SystemEventBus` | `Node` | Decoupled game event broadcaster with auto-resolver bridge |
 | **`save_vault`** | `SaveVault` | `Node` | Atomic JSON serializer with SHA-256 and `.bak` recovery |
 
 ---

@@ -9,6 +9,7 @@ extends Resource
 @export var cost: int = 0
 @export var type: String = "Generic"
 @export var category: String = "Standard"
+@export var faction: String = ""
 @export var attack: int = 0
 @export var defense: int = 0
 @export var description: String = ""
@@ -23,7 +24,8 @@ static func create(
 	p_atk: int = 0,
 	p_def: int = 0,
 	p_desc: String = "",
-	p_meta: Dictionary = {}
+	p_meta: Dictionary = {},
+	p_faction: String = ""
 ) -> Resource:
 	var c = new()
 	c.id = p_id
@@ -31,8 +33,14 @@ static func create(
 	c.cost = p_cost
 	c.type = p_type
 	c.category = p_cat
+	c.faction = p_faction if not p_faction.is_empty() else p_cat
 	c.attack = p_atk
 	c.defense = p_def
 	c.description = p_desc
 	c.metadata = p_meta
 	return c
+
+
+## Returns the effective affinity tag for board placement validation (faction or category fallback)
+func get_affinity() -> String:
+	return faction if not faction.is_empty() else category

@@ -74,3 +74,22 @@ func _on_mouse_exited() -> void:
 func _on_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		card_clicked.emit(self)
+
+
+## Native Godot Drag-and-Drop integration for board placement
+func _get_drag_data(_at_position: Vector2) -> Variant:
+	if card_data == null:
+		return null
+
+	var preview = Control.new()
+	var preview_card = duplicate() as Control
+	preview_card.position = -size / 2.0
+	preview_card.modulate = Color(1.0, 1.0, 1.0, 0.85)
+	preview.add_child(preview_card)
+	set_drag_preview(preview)
+
+	return {
+		"type": "card",
+		"card_data": card_data,
+		"source_view": self
+	}

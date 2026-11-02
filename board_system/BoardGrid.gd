@@ -13,6 +13,8 @@ const BoardSlotScene = preload("BoardSlot.tscn")
 signal slot_selected(slot: BoardSlot)
 signal slot_hover_changed(slot: BoardSlot, is_hovered: bool)
 signal occupant_dropped_on_slot(slot: BoardSlot, data: Variant)
+signal slot_damage_shaken(slot: BoardSlot, intensity: float)
+signal slot_summon_pulsed(slot: BoardSlot)
 signal grid_rebuilt()
 
 @export var sides_count: int = 2:
@@ -29,6 +31,9 @@ signal grid_rebuilt()
 
 @export var slot_spacing: int = 12
 @export var universal_affinity_tag: String = "Universal"
+
+## Optional custom affinity validator hook: func(occupant_affinity: String, slot_affinity: String) -> bool
+var custom_affinity_validator: Callable = Callable()
 
 @onready var sides_container: VBoxContainer = $SidesContainer
 
@@ -84,6 +89,8 @@ func rebuild_grid() -> void:
 			slot_node.slot_clicked.connect(_on_slot_clicked)
 			slot_node.slot_hovered.connect(_on_slot_hovered)
 			slot_node.slot_dropped.connect(_on_slot_dropped)
+			slot_node.damage_shake_started.connect(func(s, i): slot_damage_shaken.emit(s, i))
+			slot_node.summon_pulse_started.connect(func(s): slot_summon_pulsed.emit(s))
 
 			var coord = Vector2i(side_idx, lane_idx)
 			_slots_map[coord] = slot_node
@@ -186,7 +193,11 @@ func validate_placement(
 	if not is_attachment:
 		if slot.slot_data.has_primary():
 			return {"allowed": false, "reason": "Slot already contains a primary occupant."}
-		if not slot.slot_data.can_accept_affinity(occupant_affinity, universal_affinity_tag):
+		if custom_affinity_validator.is_valid():
+			var custom_res = custom_affinity_validator.call(occupant_affinity, slot.slot_data.affinity)
+			if not custom_res:
+				return {"allowed": false, "reason": "Custom affinity check failed."}
+		elif not slot.slot_data.can_accept_affinity(occupant_affinity, universal_affinity_tag):
 			return {"allowed": false, "reason": "Affinity mismatch (%s required)." % slot.slot_data.affinity}
 	else:
 		if slot.slot_data.has_attachment():

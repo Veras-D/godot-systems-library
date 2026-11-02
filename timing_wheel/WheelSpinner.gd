@@ -100,8 +100,18 @@ func _check_sector_tick() -> void:
 func _resolve_final_result() -> void:
 	state = State.RESOLVED
 	var result = config.get_sector_at_angle(current_angle_deg)
+	result["angle_deg"] = current_angle_deg
 	spin_completed.emit(result)
 	queue_redraw()
+
+
+## Returns the last resolved outcome as a typed WheelResult
+func get_last_result() -> WheelConfig.WheelResult:
+	if config == null:
+		return WheelConfig.WheelResult.new()
+	var raw = config.get_sector_at_angle(current_angle_deg)
+	raw["angle_deg"] = current_angle_deg
+	return WheelConfig.WheelResult.from_dict(raw)
 
 func _on_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:

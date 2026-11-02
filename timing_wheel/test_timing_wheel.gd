@@ -47,5 +47,14 @@ func _init() -> void:
 	assert(hit_pct >= 77.0 and hit_pct <= 83.0, "Hit within margin")
 	assert(miss_pct >= 10.0 and miss_pct <= 16.0, "Miss within margin")
 
+	# 3. Test WheelResult Contract Class
+	var mock_dict = {"id": WheelConfig.ID_CRIT, "name": "Crit", "multiplier": 2.0, "angle_deg": 120.0, "is_success": true}
+	var res_obj = WheelConfig.WheelResult.from_dict(mock_dict)
+	assert(res_obj.id == WheelConfig.ID_CRIT, "WheelResult ID must match ID_CRIT")
+	assert(res_obj.multiplier == 2.0, "WheelResult multiplier must match")
+	var back_to_dict = res_obj.to_dict()
+	assert(back_to_dict[WheelConfig.WheelResult.KEY_MULTIPLIER] == 2.0, "to_dict() must round-trip")
+	print("WheelResult contract verified.")
+
 	print("==> All Timing Wheel Unit Tests PASSED!")
 	quit(0)

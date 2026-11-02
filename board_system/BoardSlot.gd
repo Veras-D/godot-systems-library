@@ -11,6 +11,8 @@ signal slot_clicked(slot: BoardSlot)
 signal slot_hovered(slot: BoardSlot, is_hovered: bool)
 signal slot_dropped(slot: BoardSlot, data: Variant)
 signal occupant_cleared(slot: BoardSlot)
+signal damage_shake_started(slot: BoardSlot, intensity: float)
+signal summon_pulse_started(slot: BoardSlot)
 
 enum HighlightMode {
 	NONE,
@@ -126,6 +128,7 @@ func set_highlight(mode: HighlightMode) -> void:
 
 ## Play damage shake animation
 func play_damage_shake(intensity: float = 8.0, duration: float = 0.35) -> void:
+	damage_shake_started.emit(self, intensity)
 	if _shake_tween and _shake_tween.is_valid():
 		_shake_tween.kill()
 
@@ -139,6 +142,7 @@ func play_damage_shake(intensity: float = 8.0, duration: float = 0.35) -> void:
 
 ## Play summon pulse animation
 func play_summon_pulse() -> void:
+	summon_pulse_started.emit(self)
 	var tw = create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	scale = Vector2(0.9, 0.9)
 	tw.tween_property(self, "scale", Vector2.ONE, 0.25)
@@ -150,7 +154,12 @@ func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 		return false
 	if data == null:
 		return false
-	# Allow drop if slot is empty or if data is an attachment and primary slot is filled
+	# Handle standard CardDragPayload dictionary
+	if data is Dictionary and data.get("type") == "card":
+		var card = data.get("card_data")
+		if card != null and card.has_method("get_affinity"):
+			return slot_data.is_empty() and slot_data.can_accept_affinity(card.get_affinity())
+	# Fallback: allow drop if slot is empty or if data is an attachment and primary slot is filled
 	return slot_data.is_empty() or not slot_data.has_attachment()
 
 

@@ -52,6 +52,41 @@ flowchart TD
 
 ---
 
+## 📋 Universal Save Schema Standard (v1)
+
+While `SaveVault` supports any dictionary payload, consuming games should conform to this canonical top-level schema standard:
+
+```json
+{
+  "_vault_version": 1,
+  "_vault_timestamp": "2026-11-02T22:00:00",
+  "meta": {
+    "save_version": 1,
+    "playtime_seconds": 1240,
+    "display_name": "Player 1"
+  },
+  "player": {
+    "level": 14,
+    "currencies": { "gold": 3200, "gems": 15 },
+    "active_hero": "Hero_01"
+  },
+  "inventory": {
+    "cards": [ { "id": "c_01", "count": 2 } ],
+    "deck_presets": [ { "name": "Main Deck", "cards": ["c_01"] } ]
+  },
+  "campaign": {
+    "completed_stages": { "stage_01": 3 },
+    "current_stage": "stage_02"
+  },
+  "settings": {
+    "bgm_volume": 0.8,
+    "sfx_volume": 1.0
+  }
+}
+```
+
+---
+
 ## Integration Guide
 
 ### 1. Basic Save & Load
