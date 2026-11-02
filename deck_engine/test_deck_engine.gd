@@ -83,5 +83,24 @@ func _init() -> void:
 
 	# Clean up
 	hand.free()
+
+	# 4. Test CardData Property Unification (N9)
+	var test_card = CardData.create("card_test", "Affinity Test", 1, "Creature", "Beast", 2, 3, "Test", {}, "Corn")
+	assert(test_card.category == "Beast", "Category should be Beast")
+	assert(test_card.affinity == "Corn", "Affinity should be Corn")
+	assert(test_card.faction == "Corn", "Faction alias should match Affinity")
+	assert(test_card.get_affinity() == "Corn", "get_affinity() should return Corn")
+
+	# Mutating faction must update affinity
+	test_card.faction = "Plains"
+	assert(test_card.affinity == "Plains", "Mutating faction must synchronize affinity")
+	assert(test_card.get_affinity() == "Plains", "get_affinity() must return updated Plains")
+
+	# Mutating affinity must update faction
+	test_card.affinity = "Swamp"
+	assert(test_card.faction == "Swamp", "Mutating affinity must synchronize faction")
+	assert(test_card.get_affinity() == "Swamp", "get_affinity() must return updated Swamp")
+	print("CardData property unification (N9) verified.")
+
 	print("==> All DeckEngine Unit & Regression Tests PASSED!")
 	quit(0)

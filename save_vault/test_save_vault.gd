@@ -91,6 +91,29 @@ func _init() -> void:
 	assert(not vault.slot_exists("profile_1"), "Deleted slot must not exist")
 	print("Slot deletion verified.")
 
+	# 7. Test Schema Validation Hook (N10)
+	vault.enforce_schema = true
+	var invalid_payload = {"random_key": 123}
+	var save_invalid_ok = vault.save_slot("profile_invalid", invalid_payload)
+	assert(save_invalid_ok == false, "Saving invalid payload when enforce_schema is true must fail")
+
+	var valid_v1_payload = {"game_data": {"level": 5, "score": 900}}
+	var save_valid_ok = vault.save_profile("profile_valid", valid_v1_payload)
+	assert(save_valid_ok == true, "Saving valid v1 schema payload via save_profile alias must succeed")
+
+	var loaded_valid = vault.load_profile("profile_valid")
+	assert(loaded_valid.get("game_data").get("score") == 900, "load_profile alias must load saved data")
+
+	# Custom schema validator test
+	vault.schema_validator = func(d: Dictionary) -> Dictionary:
+		if not d.has("mandatory_quest_id"):
+			return {"valid": false, "error": "Missing mandatory_quest_id"}
+		return {"valid": true, "error": ""}
+
+	assert(vault.save_slot("p_custom", {"game_data": {}}) == false, "Custom validator must reject missing mandatory_quest_id")
+	assert(vault.save_slot("p_custom", {"mandatory_quest_id": "quest_42"}) == true, "Custom validator must accept matching schema")
+	print("Schema validation hook & profile aliases (N10) verified.")
+
 	# Cleanup test directory
 	_clean_dir(test_dir)
 	vault.free()

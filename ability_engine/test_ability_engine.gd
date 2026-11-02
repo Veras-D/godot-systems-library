@@ -145,6 +145,19 @@ func _init() -> void:
 	bus.free()
 	print("SystemEventBus integration verified.")
 
+	# Test SystemEventBus Opt-in Adapter Bindings (N8)
+	var bus_adapters = SystemEventBus.new()
+	var dummy_grid = Node.new()
+	dummy_grid.add_user_signal("slot_damage_shaken", [{"name": "slot", "type": TYPE_OBJECT}, {"name": "intensity", "type": TYPE_FLOAT}])
+	bus_adapters.bind_board_grid(dummy_grid)
+	var bridge_box = {"damaged": false}
+	bus_adapters.damage_dealt.connect(func(_s, _t, _a): bridge_box["damaged"] = true)
+	dummy_grid.emit_signal("slot_damage_shaken", null, 15.0)
+	assert(bridge_box["damaged"] == true, "SystemEventBus.bind_board_grid should bridge slot_damage_shaken to damage_dealt")
+	dummy_grid.free()
+	bus_adapters.free()
+	print("SystemEventBus opt-in adapter bindings (N8) verified.")
+
 	# 11. Test TargetScopes (N4)
 	var f0 = {"name": "Friendly0", "side": 0, "lane": 0, "atk": 1}
 	var f1 = {"name": "Friendly1", "side": 0, "lane": 1, "atk": 1}

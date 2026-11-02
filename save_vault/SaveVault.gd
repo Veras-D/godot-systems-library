@@ -21,6 +21,10 @@ signal migration_applied(slot_id: String, from_version: int, to_version: int)
 @export var current_version: int = 1
 @export var enable_checksum: bool = true
 @export var enable_backups: bool = true
+@export var enforce_schema: bool = false
+
+## Optional schema validator callback: func(data: Dictionary) -> Dictionary ({"valid": bool, "error": String})
+var schema_validator: Callable = Callable()
 
 # Registered migration callables: key = target_version (int), value = Callable(old_data: Dictionary) -> Dictionary
 var _migrations: Dictionary = {}
@@ -36,8 +40,24 @@ func register_migration(target_version: int, migration_callable: Callable) -> vo
 	_migrations[target_version] = migration_callable
 
 
+## Validates a save dictionary against Universal Schema v1 recommendations
+static func validate_v1_schema(data: Dictionary) -> Dictionary:
+	if not data.has("game_data") and not data.has("player_data") and not data.has("system_states"):
+		return {"valid": false, "error": "Save payload must contain at least one state container ('game_data', 'player_data', or 'system_states')"}
+	return {"valid": true, "error": ""}
+
+
 ## Saves data into a specified slot atomically
 func save_slot(slot_id: String, data: Dictionary, preview_meta: Dictionary = {}) -> bool:
+	# Schema validation check (if enforced)
+	if enforce_schema:
+		var check_res = schema_validator.call(data) if schema_validator.is_valid() else validate_v1_schema(data)
+		if not check_res.get("valid", true):
+			var err_msg = check_res.get("error", "Schema validation failed")
+			push_error("SaveVault: Schema validation failed for slot '%s': %s" % [slot_id, err_msg])
+			save_completed.emit(slot_id, false)
+			return false
+
 	_ensure_directory()
 
 	var save_path = _get_slot_path(slot_id)
@@ -140,6 +160,16 @@ func load_slot(slot_id: String) -> Dictionary:
 			corruption_detected.emit(slot_id, "Backup also corrupted: %s" % backup_res.error)
 
 	return {}
+
+
+## Alias for save_slot (conforming to Universal SaveVault profile nomenclature)
+func save_profile(profile_id: String, data: Dictionary, preview_meta: Dictionary = {}) -> bool:
+	return save_slot(profile_id, data, preview_meta)
+
+
+## Alias for load_slot (conforming to Universal SaveVault profile nomenclature)
+func load_profile(profile_id: String) -> Dictionary:
+	return load_slot(profile_id)
 
 
 ## Returns preview metadata for a slot without loading the full payload
