@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://aud10juk3b0x01"]
 
-[ext_resource type="Script" path="res://audio_jukebox/TestbedAudio.gd" id="1_script"]
+[ext_resource type="Script" path="TestbedAudio.gd" id="1_script"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.12, 0.14, 0.2, 0.95)

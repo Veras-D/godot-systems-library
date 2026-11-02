@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://crdv1ew001"]
 
-[ext_resource type="Script" path="res://deck_engine/GenericCardView.gd" id="1_script"]
+[ext_resource type="Script" path="GenericCardView.gd" id="1_script"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
 bg_color = Color(0.14, 0.16, 0.22, 1)
