@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://c83k4m7p8w2x1"]
 
-[ext_resource type="Script" uid="uid://bhxoiydgeph17" path="TestbedWheel.gd" id="1_script"]
-[ext_resource type="PackedScene" uid="uid://whl5p1nn3r001" path="WheelSpinner.tscn" id="2_wheel"]
+[ext_resource type="Script" path="TestbedWheel.gd" id="1_script"]
+[ext_resource type="PackedScene" path="WheelSpinner.tscn" id="2_wheel"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
 bg_color = Color(0.07, 0.08, 0.12, 1)

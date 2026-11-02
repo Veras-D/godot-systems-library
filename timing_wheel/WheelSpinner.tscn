@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://whl5p1nn3r001"]
 
-[ext_resource type="Script" uid="uid://njh33u3jbqfm" path="WheelSpinner.gd" id="1_script"]
+[ext_resource type="Script" path="WheelSpinner.gd" id="1_script"]
 
 [node name="WheelSpinner" type="Control"]
 custom_minimum_size = Vector2(260, 260)
