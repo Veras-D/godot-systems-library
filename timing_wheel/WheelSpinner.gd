@@ -62,6 +62,14 @@ func stop_spin() -> void:
 	# Calculate quick deceleration (stops in ~0.25 seconds)
 	_decel_rate = _current_speed / 0.25
 
+func quick_resolve() -> Dictionary:
+	if config == null:
+		return {}
+	var res = config.roll_quick_resolve()
+	current_angle_deg = res.get("angle_deg", 0.0)
+	_resolve_final_result()
+	return res
+
 func _process(delta: float) -> void:
 	if state == State.SPINNING:
 		_spin_elapsed += delta

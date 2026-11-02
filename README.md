@@ -43,8 +43,16 @@ Every folder (e.g. `timing_wheel/`) is 100% self-contained with no external depe
 
 ---
 
-## 🧪 Running the Systems Hub & Testbeds
+## 🧪 Running the Systems Hub & Automated Tests
 
+### Run All System Tests (Headless)
+To run the automated regression test suite across all modules:
+```bash
+godot --headless -s res://run_tests.gd
+```
+This discovers all `test_*.gd` suites, executes them in isolated processes, logs diagnostics on failure, and exits with code 0/1 for CI/CD.
+
+### Open the Interactive Systems Hub in Godot
 This repository is itself a runnable Godot 4 project:
 1. Open Godot 4 and click **Import**.
 2. Select `/home/verivi/Veras/Projects/godot-systems-library/project.godot`.

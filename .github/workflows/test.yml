@@ -1,0 +1,33 @@
+name: Automated System Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run Godot Systems Test Suite
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.3
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Initialize Godot Cache (.godot/)
+        run: |
+          echo "Initializing project cache and class registry..."
+          godot --headless --editor --quit
+
+      - name: Run Master Test Runner
+        env:
+          GODOT_DISABLE_LEAK_CHECKS: 1
+        run: |
+          echo "Executing all discoverable system tests..."
+          godot --headless -s res://run_tests.gd
