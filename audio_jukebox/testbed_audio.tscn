@@ -1,0 +1,338 @@
+[gd_scene load_steps=3 format=3 uid="uid://aud10juk3b0x01"]
+
+[ext_resource type="Script" path="res://audio_jukebox/TestbedAudio.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.12, 0.14, 0.2, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.25, 0.35, 0.5, 0.6)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="TestbedAudio" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.07, 0.1, 1)
+
+[node name="MainBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 16.0
+offset_right = -24.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="Header" type="VBoxContainer" parent="MainBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="MainBox/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 24
+text = "AUDIO JUKEBOX SYSTEM TESTBED"
+
+[node name="Subtitle" type="Label" parent="MainBox/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.7, 0.85, 1)
+theme_override_font_sizes/font_size = 14
+text = "Universal Dual-BGM Crossfader & SFX Bus Pool — Standalone Module"
+
+[node name="ContentBox" type="HBoxContainer" parent="MainBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="LeftCol" type="VBoxContainer" parent="MainBox/ContentBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="BgmPanel" type="PanelContainer" parent="MainBox/ContentBox/LeftCol"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Margin" type="MarginContainer" parent="MainBox/ContentBox/LeftCol/BgmPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="MainBox/ContentBox/LeftCol/BgmPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="MainBox/ContentBox/LeftCol/BgmPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "BGM CROSSFADER CONTROLLER"
+
+[node name="StatusRow" type="HBoxContainer" parent="MainBox/ContentBox/LeftCol/BgmPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="StatusLabel" type="Label" parent="MainBox/ContentBox/LeftCol/BgmPanel/Margin/VBox/StatusRow"]
+layout_mode = 2
+text = "Status: "
+
+[node name="StatusVal" type="Label" parent="MainBox/ContentBox/LeftCol/BgmPanel/Margin/VBox/StatusRow"]
+layout_mode = 2
+text = "Stopped"
+
+[node name="TrackRow" type="HBoxContainer" parent="MainBox/ContentBox/LeftCol/BgmPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainBox/ContentBox/LeftCol/BgmPanel/Margin/VBox/TrackRow"]
+layout_mode = 2
+text = "Track: "
+
+[node name="OptionButton" type="OptionButton" parent="MainBox/ContentBox/LeftCol/BgmPanel/Margin/VBox/TrackRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FadeRow" type="HBoxContainer" parent="MainBox/ContentBox/LeftCol/BgmPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainBox/ContentBox/LeftCol/BgmPanel/Margin/VBox/FadeRow"]
+layout_mode = 2
+text = "Crossfade Duration: "
+
+[node name="Slider" type="HSlider" parent="MainBox/ContentBox/LeftCol/BgmPanel/Margin/VBox/FadeRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = 0.1
+max_value = 4.0
+step = 0.1
+value = 1.0
+
+[node name="ValLabel" type="Label" parent="MainBox/ContentBox/LeftCol/BgmPanel/Margin/VBox/FadeRow"]
+custom_minimum_size = Vector2(45, 0)
+layout_mode = 2
+text = "1.0s"
+
+[node name="BtnRow" type="HBoxContainer" parent="MainBox/ContentBox/LeftCol/BgmPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PlayBtn" type="Button" parent="MainBox/ContentBox/LeftCol/BgmPanel/Margin/VBox/BtnRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "▶ Play / Crossfade"
+
+[node name="StopBtn" type="Button" parent="MainBox/ContentBox/LeftCol/BgmPanel/Margin/VBox/BtnRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "■ Stop BGM"
+
+[node name="SfxPanel" type="PanelContainer" parent="MainBox/ContentBox/LeftCol"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Margin" type="MarginContainer" parent="MainBox/ContentBox/LeftCol/SfxPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="MainBox/ContentBox/LeftCol/SfxPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="MainBox/ContentBox/LeftCol/SfxPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.7, 0.3, 1)
+theme_override_font_sizes/font_size = 16
+text = "SFX BUS POOL CONTROLLER"
+
+[node name="PoolStatusRow" type="HBoxContainer" parent="MainBox/ContentBox/LeftCol/SfxPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="PoolLabel" type="Label" parent="MainBox/ContentBox/LeftCol/SfxPanel/Margin/VBox/PoolStatusRow"]
+layout_mode = 2
+text = "Available Players: "
+
+[node name="PoolVal" type="Label" parent="MainBox/ContentBox/LeftCol/SfxPanel/Margin/VBox/PoolStatusRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 1, 0.6, 1)
+text = "8 / 8"
+
+[node name="PitchCheck" type="CheckBox" parent="MainBox/ContentBox/LeftCol/SfxPanel/Margin/VBox"]
+layout_mode = 2
+button_pressed = true
+text = "Random Pitch Variation (±15%)"
+
+[node name="BtnGrid" type="GridContainer" parent="MainBox/ContentBox/LeftCol/SfxPanel/Margin/VBox"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 8
+
+[node name="BtnHigh" type="Button" parent="MainBox/ContentBox/LeftCol/SfxPanel/Margin/VBox/BtnGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🔔 High Beep (880 Hz)"
+
+[node name="BtnMid" type="Button" parent="MainBox/ContentBox/LeftCol/SfxPanel/Margin/VBox/BtnGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🔔 Mid Beep (440 Hz)"
+
+[node name="BtnLow" type="Button" parent="MainBox/ContentBox/LeftCol/SfxPanel/Margin/VBox/BtnGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🔔 Low Beep (220 Hz)"
+
+[node name="BtnBurst" type="Button" parent="MainBox/ContentBox/LeftCol/SfxPanel/Margin/VBox/BtnGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "💥 Rapid Burst (x6)"
+
+[node name="RightCol" type="VBoxContainer" parent="MainBox/ContentBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="MixerPanel" type="PanelContainer" parent="MainBox/ContentBox/RightCol"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Margin" type="MarginContainer" parent="MainBox/ContentBox/RightCol/MixerPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBox" type="VBoxContainer" parent="MainBox/ContentBox/RightCol/MixerPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="MainBox/ContentBox/RightCol/MixerPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.5, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "AUDIO BUS MIXER"
+
+[node name="MasterRow" type="HBoxContainer" parent="MainBox/ContentBox/RightCol/MixerPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainBox/ContentBox/RightCol/MixerPanel/Margin/VBox/MasterRow"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Master:"
+
+[node name="Slider" type="HSlider" parent="MainBox/ContentBox/RightCol/MixerPanel/Margin/VBox/MasterRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="Val" type="Label" parent="MainBox/ContentBox/RightCol/MixerPanel/Margin/VBox/MasterRow"]
+custom_minimum_size = Vector2(45, 0)
+layout_mode = 2
+text = "100%"
+
+[node name="MusicRow" type="HBoxContainer" parent="MainBox/ContentBox/RightCol/MixerPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainBox/ContentBox/RightCol/MixerPanel/Margin/VBox/MusicRow"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "Music:"
+
+[node name="Slider" type="HSlider" parent="MainBox/ContentBox/RightCol/MixerPanel/Margin/VBox/MusicRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.01
+value = 0.8
+
+[node name="Val" type="Label" parent="MainBox/ContentBox/RightCol/MixerPanel/Margin/VBox/MusicRow"]
+custom_minimum_size = Vector2(45, 0)
+layout_mode = 2
+text = "80%"
+
+[node name="SfxRow" type="HBoxContainer" parent="MainBox/ContentBox/RightCol/MixerPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainBox/ContentBox/RightCol/MixerPanel/Margin/VBox/SfxRow"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+text = "SFX:"
+
+[node name="Slider" type="HSlider" parent="MainBox/ContentBox/RightCol/MixerPanel/Margin/VBox/SfxRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="Val" type="Label" parent="MainBox/ContentBox/RightCol/MixerPanel/Margin/VBox/SfxRow"]
+custom_minimum_size = Vector2(45, 0)
+layout_mode = 2
+text = "100%"
+
+[node name="MuteBtn" type="Button" parent="MainBox/ContentBox/RightCol/MixerPanel/Margin/VBox"]
+layout_mode = 2
+text = "Mute Master"
+
+[node name="LogPanel" type="PanelContainer" parent="MainBox/ContentBox/RightCol"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Margin" type="MarginContainer" parent="MainBox/ContentBox/RightCol/LogPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="VBox" type="VBoxContainer" parent="MainBox/ContentBox/RightCol/LogPanel/Margin"]
+layout_mode = 2
+
+[node name="LogTitle" type="Label" parent="MainBox/ContentBox/RightCol/LogPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "EVENT LOG"
+
+[node name="LogScroll" type="ScrollContainer" parent="MainBox/ContentBox/RightCol/LogPanel/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LogText" type="RichTextLabel" parent="MainBox/ContentBox/RightCol/LogPanel/Margin/VBox/LogScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+scroll_following = true

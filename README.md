@@ -12,7 +12,7 @@ A collection of polished, reusable, completely decoupled game systems and isolat
 | System | Directory | Description | Status |
 | :--- | :--- | :--- | :---: |
 | **Timing Wheel** | [`timing_wheel/`](./timing_wheel/) | Procedural roulette / reaction timing wheel minigame with needle kinetics & quick-resolve math. | ✅ **Production Ready** |
-| **Audio Jukebox** | `audio_jukebox/` | BGM crossfader, dynamic state audio, and SFX bus pool with volume persistence. | 🚧 *Planned* |
+| **Audio Jukebox** | [`audio_jukebox/`](./audio_jukebox/) | Dual-BGM crossfader, SFX bus player pool with pitch variation, and volume persistence. | ✅ **Production Ready** |
 | **Deck Engine** | `deck_engine/` | Universal Card, Hand layout, Deck shuffling, Draw kinetics, and Graveyard manager. | 🚧 *Planned* |
 | **Board System** | `board_system/` | Universal lane & grid board slotting, drop target arbitration, and placement affinity. | 🚧 *Planned* |
 | **Ability Engine** | `ability_engine/` | Universal trigger/action effect resolver, queue processor, and event bus. | 🚧 *Planned* |
