@@ -1,0 +1,388 @@
+[gd_scene load_steps=5 format=3 uid="uid://dcktb001"]
+
+[ext_resource type="Script" path="res://deck_engine/TestbedDeck.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://deck_engine/HandManager.tscn" id="2_hand"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.12, 0.14, 0.2, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.25, 0.35, 0.5, 0.6)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stat_pill"]
+bg_color = Color(0.08, 0.1, 0.15, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.4, 0.6, 0.4)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="TestbedDeck" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.07, 0.1, 1)
+
+[node name="MainBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 14.0
+offset_right = -20.0
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="Header" type="VBoxContainer" parent="MainBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="MainBox/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 22
+text = "DECK & HAND ENGINE TESTBED"
+
+[node name="Subtitle" type="Label" parent="MainBox/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.7, 0.85, 1)
+theme_override_font_sizes/font_size = 13
+text = "Universal Card, Deck, Discard Recycling & Parabolic Fan Hand Layout"
+
+[node name="TopBox" type="HBoxContainer" parent="MainBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="StatsPanel" type="PanelContainer" parent="MainBox/TopBox"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Margin" type="MarginContainer" parent="MainBox/TopBox/StatsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 12
+
+[node name="HBox" type="HBoxContainer" parent="MainBox/TopBox/StatsPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="DrawBadge" type="PanelContainer" parent="MainBox/TopBox/StatsPanel/Margin/HBox"]
+custom_minimum_size = Vector2(90, 50)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_stat_pill")
+
+[node name="VBox" type="VBoxContainer" parent="MainBox/TopBox/StatsPanel/Margin/HBox/DrawBadge"]
+layout_mode = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="MainBox/TopBox/StatsPanel/Margin/HBox/DrawBadge/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 11
+text = "DRAW PILE"
+horizontal_alignment = 1
+
+[node name="Val" type="Label" parent="MainBox/TopBox/StatsPanel/Margin/HBox/DrawBadge"]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "16"
+horizontal_alignment = 1
+
+[node name="DiscardBadge" type="PanelContainer" parent="MainBox/TopBox/StatsPanel/Margin/HBox"]
+custom_minimum_size = Vector2(90, 50)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_stat_pill")
+
+[node name="VBox" type="VBoxContainer" parent="MainBox/TopBox/StatsPanel/Margin/HBox/DiscardBadge"]
+layout_mode = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="MainBox/TopBox/StatsPanel/Margin/HBox/DiscardBadge/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.6, 0.4, 1)
+theme_override_font_sizes/font_size = 11
+text = "DISCARD"
+horizontal_alignment = 1
+
+[node name="Val" type="Label" parent="MainBox/TopBox/StatsPanel/Margin/HBox/DiscardBadge"]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "0"
+horizontal_alignment = 1
+
+[node name="BanishBadge" type="PanelContainer" parent="MainBox/TopBox/StatsPanel/Margin/HBox"]
+custom_minimum_size = Vector2(90, 50)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_stat_pill")
+
+[node name="VBox" type="VBoxContainer" parent="MainBox/TopBox/StatsPanel/Margin/HBox/BanishBadge"]
+layout_mode = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="MainBox/TopBox/StatsPanel/Margin/HBox/BanishBadge/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.4, 1, 1)
+theme_override_font_sizes/font_size = 11
+text = "BANISHED"
+horizontal_alignment = 1
+
+[node name="Val" type="Label" parent="MainBox/TopBox/StatsPanel/Margin/HBox/BanishBadge"]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "0"
+horizontal_alignment = 1
+
+[node name="HandBadge" type="PanelContainer" parent="MainBox/TopBox/StatsPanel/Margin/HBox"]
+custom_minimum_size = Vector2(90, 50)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_stat_pill")
+
+[node name="VBox" type="VBoxContainer" parent="MainBox/TopBox/StatsPanel/Margin/HBox/HandBadge"]
+layout_mode = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="MainBox/TopBox/StatsPanel/Margin/HBox/HandBadge/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 1, 0.6, 1)
+theme_override_font_sizes/font_size = 11
+text = "HAND SIZE"
+horizontal_alignment = 1
+
+[node name="Val" type="Label" parent="MainBox/TopBox/StatsPanel/Margin/HBox/HandBadge"]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "4 / 10"
+horizontal_alignment = 1
+
+[node name="ActionPanel" type="PanelContainer" parent="MainBox/TopBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Margin" type="MarginContainer" parent="MainBox/TopBox/ActionPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="MainBox/TopBox/ActionPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="BtnRow1" type="HBoxContainer" parent="MainBox/TopBox/ActionPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Draw1Btn" type="Button" parent="MainBox/TopBox/ActionPanel/Margin/VBox/BtnRow1"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "+ Draw 1"
+
+[node name="Draw3Btn" type="Button" parent="MainBox/TopBox/ActionPanel/Margin/VBox/BtnRow1"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "+ Draw 3"
+
+[node name="DiscardSelBtn" type="Button" parent="MainBox/TopBox/ActionPanel/Margin/VBox/BtnRow1"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Discard Selected"
+
+[node name="BtnRow2" type="HBoxContainer" parent="MainBox/TopBox/ActionPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="DiscardAllBtn" type="Button" parent="MainBox/TopBox/ActionPanel/Margin/VBox/BtnRow2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Discard All"
+
+[node name="ShuffleBtn" type="Button" parent="MainBox/TopBox/ActionPanel/Margin/VBox/BtnRow2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Shuffle Deck"
+
+[node name="RecycleBtn" type="Button" parent="MainBox/TopBox/ActionPanel/Margin/VBox/BtnRow2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Recycle Discard"
+
+[node name="ResetBtn" type="Button" parent="MainBox/TopBox/ActionPanel/Margin/VBox"]
+layout_mode = 2
+text = "🔄 Reset Demo Deck (20 Cards)"
+
+[node name="ControlsBox" type="HBoxContainer" parent="MainBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="SlidersPanel" type="PanelContainer" parent="MainBox/ControlsBox"]
+custom_minimum_size = Vector2(380, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Margin" type="MarginContainer" parent="MainBox/ControlsBox/SlidersPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="MainBox/ControlsBox/SlidersPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="MainBox/ControlsBox/SlidersPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "HAND LAYOUT PARAMETERS"
+
+[node name="WidthRow" type="HBoxContainer" parent="MainBox/ControlsBox/SlidersPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainBox/ControlsBox/SlidersPanel/Margin/VBox/WidthRow"]
+custom_minimum_size = Vector2(110, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Max Width:"
+
+[node name="Slider" type="HSlider" parent="MainBox/ControlsBox/SlidersPanel/Margin/VBox/WidthRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+min_value = 400.0
+max_value = 1000.0
+step = 10.0
+value = 650.0
+
+[node name="Val" type="Label" parent="MainBox/ControlsBox/SlidersPanel/Margin/VBox/WidthRow"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "650px"
+
+[node name="ArcRow" type="HBoxContainer" parent="MainBox/ControlsBox/SlidersPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainBox/ControlsBox/SlidersPanel/Margin/VBox/ArcRow"]
+custom_minimum_size = Vector2(110, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Arc Height:"
+
+[node name="Slider" type="HSlider" parent="MainBox/ControlsBox/SlidersPanel/Margin/VBox/ArcRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 80.0
+step = 2.0
+value = 35.0
+
+[node name="Val" type="Label" parent="MainBox/ControlsBox/SlidersPanel/Margin/VBox/ArcRow"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "35px"
+
+[node name="AngleRow" type="HBoxContainer" parent="MainBox/ControlsBox/SlidersPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainBox/ControlsBox/SlidersPanel/Margin/VBox/AngleRow"]
+custom_minimum_size = Vector2(110, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Fan Spread:"
+
+[node name="Slider" type="HSlider" parent="MainBox/ControlsBox/SlidersPanel/Margin/VBox/AngleRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 60.0
+step = 2.0
+value = 28.0
+
+[node name="Val" type="Label" parent="MainBox/ControlsBox/SlidersPanel/Margin/VBox/AngleRow"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "28°"
+
+[node name="LogPanel" type="PanelContainer" parent="MainBox/ControlsBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Margin" type="MarginContainer" parent="MainBox/ControlsBox/LogPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="VBox" type="VBoxContainer" parent="MainBox/ControlsBox/LogPanel/Margin"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="MainBox/ControlsBox/LogPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.8, 1)
+theme_override_font_sizes/font_size = 12
+text = "EVENT LOG"
+
+[node name="LogScroll" type="ScrollContainer" parent="MainBox/ControlsBox/LogPanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 85)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LogText" type="RichTextLabel" parent="MainBox/ControlsBox/LogPanel/Margin/VBox/LogScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+scroll_following = true
+
+[node name="HandContainer" type="Control" parent="MainBox"]
+custom_minimum_size = Vector2(0, 240)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HandManager" parent="MainBox/HandContainer" instance=ExtResource("2_hand")]
+layout_mode = 1
+anchors_preset = 15
+anchor_top = 0.0
+offset_top = 0.0
+grow_vertical = 2
