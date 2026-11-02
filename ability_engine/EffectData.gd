@@ -83,6 +83,14 @@ static func create_draw(p_count: int) -> Resource:
 	return eff
 
 
+static func create_discard(p_count: int, p_target: TargetScope = TargetScope.SELF) -> Resource:
+	var eff = new()
+	eff.type = EffectType.DISCARD_CARD
+	eff.amount = p_count
+	eff.target_scope = p_target
+	return eff
+
+
 func to_string_summary() -> String:
 	match type:
 		EffectType.DAMAGE:
@@ -96,6 +104,8 @@ func to_string_summary() -> String:
 			return "Gain %d Resource" % amount
 		EffectType.DRAW_CARD:
 			return "Draw %d Cards" % amount
+		EffectType.DISCARD_CARD:
+			return "Discard %d Cards from %s" % [amount, TargetScope.keys()[target_scope]]
 		EffectType.DESTROY:
 			return "Destroy %s" % TargetScope.keys()[target_scope]
 		_:

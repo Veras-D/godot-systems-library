@@ -2,7 +2,6 @@
 .godot/
 *.translation
 *.import
-*.uid
 
 # Agent / Tooling files
 .agents/

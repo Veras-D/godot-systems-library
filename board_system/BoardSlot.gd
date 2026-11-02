@@ -44,6 +44,10 @@ enum HighlightMode {
 	"Default": Color(0.12, 0.15, 0.22, 0.85)
 }
 
+## Optional reference to parent BoardGrid or custom validator for drop checks
+var grid_owner: Node = null
+var custom_affinity_validator: Callable = Callable()
+
 @onready var background_panel: Panel = $Background
 @onready var highlight_overlay: Panel = $HighlightOverlay
 @onready var affinity_badge: Label = $Header/AffinityBadge
@@ -152,15 +156,42 @@ func play_summon_pulse() -> void:
 func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 	if slot_data == null or slot_data.is_locked or slot_data.is_disabled:
 		return false
-	if data == null:
+	if data == null or not (data is Dictionary):
 		return false
-	# Handle standard CardDragPayload dictionary
-	if data is Dictionary and data.get("type") == "card":
+
+	var payload_type = data.get("type", "")
+	if payload_type == "card":
 		var card = data.get("card_data")
-		if card != null and card.has_method("get_affinity"):
-			return slot_data.is_empty() and slot_data.can_accept_affinity(card.get_affinity())
-	# Fallback: allow drop if slot is empty or if data is an attachment and primary slot is filled
-	return slot_data.is_empty() or not slot_data.has_attachment()
+		if card == null:
+			return false # Malformed card payload
+
+		var aff: String = ""
+		if card is Object and card.has_method("get_affinity"):
+			aff = card.get_affinity()
+		elif card is Dictionary and card.has("affinity"):
+			aff = str(card.get("affinity"))
+		elif card is Dictionary and card.has("faction"):
+			aff = str(card.get("faction"))
+		elif card is Object and "affinity" in card:
+			aff = str(card.get("affinity"))
+		elif card is Object and "faction" in card:
+			aff = str(card.get("faction"))
+		else:
+			return false # Malformed card with no affinity/faction
+
+		if grid_owner != null and grid_owner.has_method("validate_placement"):
+			return grid_owner.validate_placement(aff, slot_data.side, slot_data.lane_index, false).get("allowed", false)
+		elif custom_affinity_validator.is_valid():
+			return slot_data.is_empty() and custom_affinity_validator.call(aff, slot_data.affinity)
+		return slot_data.is_empty() and slot_data.can_accept_affinity(aff)
+
+	elif payload_type == "attachment":
+		if grid_owner != null and grid_owner.has_method("validate_placement"):
+			return grid_owner.validate_placement("", slot_data.side, slot_data.lane_index, true).get("allowed", false)
+		return slot_data.has_primary() and not slot_data.has_attachment()
+
+	# Disallow any other malformed or unrecognized payload
+	return false
 
 
 func _drop_data(_at_position: Vector2, data: Variant) -> void:

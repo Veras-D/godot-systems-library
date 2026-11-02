@@ -149,6 +149,26 @@ func _init() -> void:
 	assert(val_custom.allowed == true, "Custom affinity validator should accept Wildcard")
 	print("Board animation signals & custom validator verified.")
 
+	# 11. Test Drag-and-Drop Drop Rules (N2 & N3)
+	var test_slot = grid_inst.get_slot(0, 0) # Slot (0, 0) affinity is Sand
+	assert(not test_slot._can_drop_data(Vector2.ZERO, null), "Drop check must reject null data")
+	assert(not test_slot._can_drop_data(Vector2.ZERO, {"type": "unknown"}), "Drop check must reject unknown payload")
+	assert(not test_slot._can_drop_data(Vector2.ZERO, {"type": "card", "card_data": null}), "Drop check must reject malformed card payload with null card_data")
+	assert(not test_slot._can_drop_data(Vector2.ZERO, {"type": "card", "card_data": "invalid"}), "Drop check must reject card payload without affinity")
+
+	# Affinity mismatch via drag-drop
+	var grass_card = {"affinity": "Grass"}
+	assert(not test_slot._can_drop_data(Vector2.ZERO, {"type": "card", "card_data": grass_card}), "Drag-drop must reject Grass card on Sand slot")
+
+	# Affinity match via drag-drop
+	var sand_card = {"affinity": "Sand"}
+	assert(test_slot._can_drop_data(Vector2.ZERO, {"type": "card", "card_data": sand_card}), "Drag-drop must accept Sand card on Sand slot")
+
+	# Custom validator via drag-drop (N3)
+	var wildcard_card = {"affinity": "Wildcard"}
+	assert(test_slot._can_drop_data(Vector2.ZERO, {"type": "card", "card_data": wildcard_card}), "Drag-drop must respect custom affinity validator for Wildcard")
+	print("Drag-and-drop validation & custom validator (N2/N3) verified.")
+
 	grid_inst.free()
 	print("==================================================")
 	print("ALL BOARD & LANE SYSTEM UNIT TESTS PASSED (100%)")

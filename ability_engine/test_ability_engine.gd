@@ -145,6 +145,64 @@ func _init() -> void:
 	bus.free()
 	print("SystemEventBus integration verified.")
 
+	# 11. Test TargetScopes (N4)
+	var f0 = {"name": "Friendly0", "side": 0, "lane": 0, "atk": 1}
+	var f1 = {"name": "Friendly1", "side": 0, "lane": 1, "atk": 1}
+	var f2 = {"name": "Friendly2", "side": 0, "lane": 2, "atk": 1}
+	var e0 = {"name": "Enemy0", "side": 1, "lane": 0, "atk": 1}
+	var e1 = {"name": "Enemy1", "side": 1, "lane": 1, "atk": 1}
+
+	var scope_ctx = EffectContext.create(f1, 0, 1, [f0, f1, f2, e0, e1])
+	scope_ctx.set_var("friendly_units", [f0, f1, f2])
+	scope_ctx.set_var("enemy_units", [e0, e1])
+
+	# ALL_FRIENDLY
+	var res_all_friendly = resolver._resolve_targets(EffectData.TargetScope.ALL_FRIENDLY, scope_ctx)
+	assert(res_all_friendly.size() == 3, "ALL_FRIENDLY should resolve all 3 friendly units")
+
+	# ALL_ENEMY
+	var res_all_enemy = resolver._resolve_targets(EffectData.TargetScope.ALL_ENEMY, scope_ctx)
+	assert(res_all_enemy.size() == 2, "ALL_ENEMY should resolve all 2 enemy units")
+
+	# ADJACENT_FRIENDLY (f1 is at lane 1, adjacent are f0 at lane 0 and f2 at lane 2)
+	var res_adj = resolver._resolve_targets(EffectData.TargetScope.ADJACENT_FRIENDLY, scope_ctx)
+	assert(res_adj.size() == 2, "ADJACENT_FRIENDLY should resolve lanes 0 and 2 (count: 2)")
+
+	# OPPOSING_LANE (f1 is at lane 1, opposing enemy is e1 at lane 1)
+	var res_opp = resolver._resolve_targets(EffectData.TargetScope.OPPOSING_LANE, scope_ctx)
+	assert(res_opp.size() == 1 and res_opp[0]["name"] == "Enemy1", "OPPOSING_LANE should resolve Enemy1 at lane 1")
+
+	# RANDOM_ENEMY (1 random enemy from [e0, e1])
+	scope_ctx.set_var("random_count", 1)
+	var res_rand = resolver._resolve_targets(EffectData.TargetScope.RANDOM_ENEMY, scope_ctx)
+	assert(res_rand.size() == 1 and (res_rand[0]["name"] == "Enemy0" or res_rand[0]["name"] == "Enemy1"), "RANDOM_ENEMY should resolve 1 enemy")
+
+	# ALL_UNITS
+	var res_all_units = resolver._resolve_targets(EffectData.TargetScope.ALL_UNITS, scope_ctx)
+	assert(res_all_units.size() == 5, "ALL_UNITS should resolve all 5 units")
+	print("TargetScope resolution (N4) verified.")
+
+	# 12. Test DISCARD_CARD (N5)
+	var discard_eff = EffectData.create_discard(2)
+	assert(discard_eff.type == EffectData.EffectType.DISCARD_CARD, "Type must be DISCARD_CARD")
+	assert(discard_eff.amount == 2, "Discard amount must be 2")
+
+	var hand_state = {"hand": ["card1", "card2", "card3", "card4"]}
+	var discard_ctx = EffectContext.create(hand_state, 0, 0, [hand_state])
+	resolver.enqueue_effect(discard_eff, discard_ctx)
+	resolver.resolve_all_sync()
+	assert(hand_state["hand"].size() == 2, "Hand size should decrease from 4 to 2 after discarding 2")
+	assert(hand_state["cards_discarded"] == 2, "cards_discarded should be 2")
+	print("DISCARD_CARD effect (N5) verified.")
+
+	# 13. Test Target Shape Mismatch (N6)
+	var invalid_target = "string_cannot_take_damage"
+	var invalid_ctx = EffectContext.create(null, 0, 0, [invalid_target])
+	resolver.enqueue_effect(dmg_eff, invalid_ctx)
+	# Should not crash, safely logs warning and returns 0 applied
+	resolver.resolve_all_sync()
+	print("Target shape mismatch handling (N6) verified.")
+
 	resolver.free()
 
 	print("==================================================")

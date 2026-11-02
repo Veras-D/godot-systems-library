@@ -33,7 +33,12 @@ signal grid_rebuilt()
 @export var universal_affinity_tag: String = "Universal"
 
 ## Optional custom affinity validator hook: func(occupant_affinity: String, slot_affinity: String) -> bool
-var custom_affinity_validator: Callable = Callable()
+var custom_affinity_validator: Callable = Callable():
+	set(val):
+		custom_affinity_validator = val
+		for slot in _slots_map.values():
+			if slot != null and "custom_affinity_validator" in slot:
+				slot.custom_affinity_validator = val
 
 @onready var sides_container: VBoxContainer = $SidesContainer
 
@@ -82,6 +87,9 @@ func rebuild_grid() -> void:
 			var slot_node = BoardSlotScene.instantiate() as BoardSlot
 			var s_data = SlotData.create(side_idx, lane_idx, "")
 			slot_node.name = "Slot_%d_%d" % [side_idx, lane_idx]
+			slot_node.grid_owner = self
+			if custom_affinity_validator.is_valid():
+				slot_node.custom_affinity_validator = custom_affinity_validator
 			row_box.add_child(slot_node)
 			slot_node.setup(s_data)
 

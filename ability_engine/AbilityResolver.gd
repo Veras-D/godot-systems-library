@@ -132,11 +132,168 @@ func _resolve_targets(scope: EffectData.TargetScope, context: EffectContext) -> 
 			elif not context.targets.is_empty():
 				return [context.targets[0]]
 			return []
+
 		EffectData.TargetScope.TARGET_SINGLE:
+			if not context.targets.is_empty():
+				return [context.targets[0]]
+			return []
+
+		EffectData.TargetScope.ALL_FRIENDLY:
+			# 1. Explicit friendly list in context variables
+			var friendly_list = context.get_var("friendly_units")
+			if friendly_list is Array:
+				return friendly_list.duplicate()
+
+			# 2. Board Grid provider
+			var grid = context.get_var("board_grid", context.get_var("board"))
+			if grid != null and grid.has_method("get_occupied_slots"):
+				var slots = grid.get_occupied_slots(context.source_side)
+				var units: Array = []
+				for s in slots:
+					units.append(s.slot_data.primary_occupant if s.slot_data and s.slot_data.has_primary() else s)
+				return units
+
+			# 3. Filter targets pool by friendly side
+			var matched: Array = []
+			for t in context.targets:
+				if _get_entity_side(t, context.source_side) == context.source_side:
+					matched.append(t)
+			if not matched.is_empty():
+				return matched
 			return context.targets.duplicate()
+
+		EffectData.TargetScope.ALL_ENEMY:
+			# 1. Explicit enemy list in context variables
+			var enemy_list = context.get_var("enemy_units")
+			if enemy_list is Array:
+				return enemy_list.duplicate()
+
+			# 2. Board Grid provider
+			var grid = context.get_var("board_grid", context.get_var("board"))
+			if grid != null and grid.has_method("get_occupied_slots"):
+				var slots = grid.get_occupied_slots(-1)
+				var units: Array = []
+				for s in slots:
+					if s.slot_data and s.slot_data.side != context.source_side:
+						units.append(s.slot_data.primary_occupant if s.slot_data.has_primary() else s)
+				return units
+
+			# 3. Filter targets pool by opposing side
+			var matched: Array = []
+			for t in context.targets:
+				if _get_entity_side(t, -1) != -1 and _get_entity_side(t) != context.source_side:
+					matched.append(t)
+			if not matched.is_empty():
+				return matched
+			return context.targets.duplicate()
+
+		EffectData.TargetScope.ADJACENT_FRIENDLY:
+			# Left and right neighboring units on same side
+			var grid = context.get_var("board_grid", context.get_var("board"))
+			if grid != null and grid.has_method("get_slot"):
+				var adj_units: Array = []
+				for lane_offset in [-1, 1]:
+					var adj_slot = grid.get_slot(context.source_side, context.source_lane + lane_offset)
+					if adj_slot != null and adj_slot.slot_data and not adj_slot.slot_data.is_empty():
+						adj_units.append(adj_slot.slot_data.primary_occupant if adj_slot.slot_data.has_primary() else adj_slot)
+				return adj_units
+
+			# Candidate pool filtering
+			var adj_matched: Array = []
+			for t in context.targets:
+				if _get_entity_side(t, context.source_side) == context.source_side:
+					if abs(_get_entity_lane(t) - context.source_lane) == 1:
+						adj_matched.append(t)
+			return adj_matched
+
+		EffectData.TargetScope.OPPOSING_LANE:
+			# The enemy unit in the opposing slot
+			var grid = context.get_var("board_grid", context.get_var("board"))
+			if grid != null and grid.has_method("get_opposing_slot"):
+				var cur_slot = grid.get_slot(context.source_side, context.source_lane)
+				if cur_slot != null:
+					var opp_slot = grid.get_opposing_slot(cur_slot)
+					if opp_slot != null and opp_slot.slot_data and not opp_slot.slot_data.is_empty():
+						return [opp_slot.slot_data.primary_occupant if opp_slot.slot_data.has_primary() else opp_slot]
+			elif grid != null and grid.has_method("get_slot"):
+				var opp_side = 1 - context.source_side if grid.get("sides_count") == 2 else (context.source_side + 1)
+				var opp_slot = grid.get_slot(opp_side, context.source_lane)
+				if opp_slot != null and opp_slot.slot_data and not opp_slot.slot_data.is_empty():
+					return [opp_slot.slot_data.primary_occupant if opp_slot.slot_data.has_primary() else opp_slot]
+
+			# Candidate pool filtering
+			for t in context.targets:
+				if _get_entity_side(t, -1) != context.source_side and _get_entity_lane(t) == context.source_lane:
+					return [t]
+			return []
+
+		EffectData.TargetScope.RANDOM_ENEMY:
+			var enemies = _resolve_targets(EffectData.TargetScope.ALL_ENEMY, context)
+			if enemies.is_empty():
+				return []
+			var count = int(context.get_var("random_count", 1))
+			var shuffled = enemies.duplicate()
+			shuffled.shuffle()
+			return shuffled.slice(0, count)
+
+		EffectData.TargetScope.ALL_UNITS:
+			var grid = context.get_var("board_grid", context.get_var("board"))
+			if grid != null and grid.has_method("get_occupied_slots"):
+				var slots = grid.get_occupied_slots(-1)
+				var units: Array = []
+				for s in slots:
+					units.append(s.slot_data.primary_occupant if s.slot_data and s.slot_data.has_primary() else s)
+				return units
+
+			# Combine friendly and enemy or use targets
+			var all_pool: Array = []
+			var f_units = context.get_var("friendly_units")
+			if f_units is Array:
+				all_pool.append_array(f_units)
+			var e_units = context.get_var("enemy_units")
+			if e_units is Array:
+				all_pool.append_array(e_units)
+			if not all_pool.is_empty():
+				return all_pool
+			return context.targets.duplicate()
+
 		_:
-			# If targets are explicitly populated in context, fall back to them
 			return context.targets.duplicate()
+
+
+func _get_entity_side(entity: Variant, default_side: int = 0) -> int:
+	if entity is Dictionary:
+		return int(entity.get("side", entity.get("team", default_side)))
+	if entity is Object:
+		if "slot_data" in entity and entity.slot_data != null:
+			return entity.slot_data.side
+		if "side" in entity:
+			return int(entity.get("side"))
+		if "team" in entity:
+			return int(entity.get("team"))
+		if "is_player" in entity:
+			return 0 if entity.is_player else 1
+	return default_side
+
+
+func _get_entity_lane(entity: Variant, default_lane: int = 0) -> int:
+	if entity is Dictionary:
+		return int(entity.get("lane", entity.get("lane_index", default_lane)))
+	if entity is Object:
+		if "slot_data" in entity and entity.slot_data != null:
+			return entity.slot_data.lane_index
+		if "lane_index" in entity:
+			return int(entity.get("lane_index"))
+		if "lane" in entity:
+			return int(entity.get("lane"))
+	return default_lane
+
+
+## Helper to unpack primary occupant from a BoardSlot / slot-like target
+func _unpack_target(target: Variant) -> Variant:
+	if target is Object and "slot_data" in target and target.slot_data != null and target.slot_data.has_primary():
+		return target.slot_data.primary_occupant
+	return target
 
 
 ## Applies the concrete effect logic to a single target
@@ -148,23 +305,26 @@ func _execute_effect_on_target(
 	if custom_effect_handler.is_valid():
 		return custom_effect_handler.call(effect, context, target)
 
+	var actual_target = _unpack_target(target)
 	var applied_val: int = 0
 
 	match effect.type:
 		EffectData.EffectType.DAMAGE:
-			applied_val = _apply_damage(target, effect.amount)
+			applied_val = _apply_damage(actual_target, effect.amount)
 		EffectData.EffectType.HEAL:
-			applied_val = _apply_heal(target, effect.amount)
+			applied_val = _apply_heal(actual_target, effect.amount)
 		EffectData.EffectType.BUFF_STAT:
-			applied_val = _apply_buff(target, effect.stat_name, effect.amount)
+			applied_val = _apply_buff(actual_target, effect.stat_name, effect.amount)
 		EffectData.EffectType.GAIN_RESOURCE:
-			applied_val = _apply_resource(target, effect.amount)
+			applied_val = _apply_resource(actual_target, effect.amount)
 		EffectData.EffectType.DRAW_CARD:
-			applied_val = _apply_draw(target, effect.amount)
+			applied_val = _apply_draw(actual_target, effect.amount)
+		EffectData.EffectType.DISCARD_CARD:
+			applied_val = _apply_discard(actual_target, effect.amount, effect.metadata)
 		EffectData.EffectType.DESTROY:
-			applied_val = _apply_destroy(target)
+			applied_val = _apply_destroy(actual_target)
 		EffectData.EffectType.SWAP_STATS:
-			applied_val = _apply_swap_stats(target, effect.stat_name, effect.metadata.get("stat_b", "def"))
+			applied_val = _apply_swap_stats(actual_target, effect.stat_name, effect.metadata.get("stat_b", "def"))
 		_:
 			applied_val = effect.amount
 
@@ -175,18 +335,24 @@ func _apply_damage(target: Variant, amount: int) -> int:
 	if target == null:
 		return 0
 
-	# 1. Method call take_damage
-	if target is Object and target.has_method("take_damage"):
-		return target.take_damage(amount)
+	# 1. Method call take_damage or apply_damage
+	if target is Object:
+		if target.has_method("take_damage"):
+			return target.take_damage(amount)
+		if target.has_method("apply_damage"):
+			var res = target.apply_damage(amount)
+			return amount if res is bool else int(res)
 
 	# 2. Dictionary target
 	if target is Dictionary:
-		var cur_def = target.get("def", target.get("hp", 0))
+		var cur_def = target.get("def", target.get("hp", target.get("current_def", 0)))
 		var new_def = max(0, cur_def - amount)
 		if target.has("def"):
 			target["def"] = new_def
 		elif target.has("hp"):
 			target["hp"] = new_def
+		elif target.has("current_def"):
+			target["current_def"] = new_def
 		if new_def == 0:
 			target["is_destroyed"] = true
 		return amount
@@ -200,6 +366,7 @@ func _apply_damage(target: Variant, amount: int) -> int:
 				target.set(prop, new_val)
 				return amount
 
+	push_warning("[AbilityResolver] Cannot apply DAMAGE (%d) to target of type %s: target missing take_damage(), apply_damage(), or DEF/HP properties." % [amount, type_string(typeof(target))])
 	return 0
 
 
@@ -207,11 +374,15 @@ func _apply_heal(target: Variant, amount: int) -> int:
 	if target == null:
 		return 0
 
-	if target is Object and target.has_method("heal"):
-		return target.heal(amount)
+	if target is Object:
+		if target.has_method("heal"):
+			return target.heal(amount)
+		if target.has_method("heal_to_full"):
+			target.heal_to_full()
+			return amount
 
 	if target is Dictionary:
-		var cur_def = target.get("def", target.get("hp", 0))
+		var cur_def = target.get("def", target.get("hp", target.get("current_def", 0)))
 		var max_def = target.get("max_def", target.get("max_hp", 999999))
 		var new_def = min(max_def, cur_def + amount)
 		var actual_heal = new_def - cur_def
@@ -219,6 +390,8 @@ func _apply_heal(target: Variant, amount: int) -> int:
 			target["def"] = new_def
 		elif target.has("hp"):
 			target["hp"] = new_def
+		elif target.has("current_def"):
+			target["current_def"] = new_def
 		return actual_heal
 
 	if target is Object:
@@ -228,6 +401,7 @@ func _apply_heal(target: Variant, amount: int) -> int:
 				target.set(prop, current + amount)
 				return amount
 
+	push_warning("[AbilityResolver] Cannot apply HEAL (%d) to target of type %s: target missing heal(), heal_to_full(), or DEF/HP properties." % [amount, type_string(typeof(target))])
 	return 0
 
 
@@ -236,68 +410,164 @@ func _apply_buff(target: Variant, stat_name: String, amount: int) -> int:
 		return 0
 
 	var key = stat_name.to_lower()
-	if target is Object and target.has_method("apply_buff"):
-		return target.apply_buff(key, amount)
+	if target is Object:
+		if target.has_method("apply_buff"):
+			return target.apply_buff(key, amount)
+		if key == "atk" and target.has_method("modify_atk"):
+			target.modify_atk(amount)
+			return amount
+		if key == "def" and target.has_method("modify_def"):
+			target.modify_def(amount)
+			return amount
 
 	if target is Dictionary:
-		var cur_val = target.get(key, 0)
-		target[key] = cur_val + amount
-		return amount
+		if target.has(key) or target.has("current_" + key):
+			var actual_key = key if target.has(key) else ("current_" + key)
+			var cur_val = target.get(actual_key, 0)
+			target[actual_key] = cur_val + amount
+			return amount
 
-	if target is Object and key in target:
-		var current = target.get(key)
-		target.set(key, current + amount)
-		return amount
+	if target is Object:
+		for k in [key, "current_" + key]:
+			if k in target:
+				var current = target.get(k)
+				target.set(k, current + amount)
+				return amount
 
+	push_warning("[AbilityResolver] Cannot apply BUFF_STAT (%s += %d) to target of type %s: stat '%s' not found on target." % [stat_name, amount, type_string(typeof(target)), key])
 	return 0
 
 
 func _apply_resource(target: Variant, amount: int) -> int:
+	if target == null:
+		return 0
+
 	if target is Object and target.has_method("gain_resource"):
 		return target.gain_resource(amount)
+
 	if target is Dictionary:
-		var cur = target.get("magic", target.get("mana", target.get("resource", 0)))
-		target["magic"] = cur + amount
+		for prop in ["magic", "mana", "resource", "action_points", "mp"]:
+			if target.has(prop):
+				target[prop] = target.get(prop, 0) + amount
+				return amount
+		target["magic"] = target.get("magic", 0) + amount
 		return amount
-	return amount
+
+	if target is Object:
+		for prop in ["magic", "mana", "resource", "action_points", "mp", "player_mp"]:
+			if prop in target:
+				var cur = target.get(prop)
+				target.set(prop, cur + amount)
+				return amount
+
+	push_warning("[AbilityResolver] Cannot apply GAIN_RESOURCE (%d) to target of type %s: target missing gain_resource() or resource property." % [amount, type_string(typeof(target))])
+	return 0
 
 
 func _apply_draw(target: Variant, count: int) -> int:
-	if target is Object and target.has_method("draw_cards"):
-		return target.draw_cards(count)
+	if target == null:
+		return 0
+
+	if target is Object:
+		if target.has_method("draw_cards"):
+			return target.draw_cards(count)
+		if target.has_method("draw_player_card"):
+			for _i in range(count):
+				target.draw_player_card()
+			return count
+		if target.has_method("draw"):
+			return target.draw(count)
+
 	if target is Dictionary:
 		target["cards_drawn"] = target.get("cards_drawn", 0) + count
 		return count
-	return count
+
+	push_warning("[AbilityResolver] Cannot apply DRAW_CARD (%d) to target of type %s: target missing draw_cards() or cards_drawn dictionary key." % [count, type_string(typeof(target))])
+	return 0
+
+
+func _apply_discard(target: Variant, count: int, _metadata: Dictionary = {}) -> int:
+	if target == null:
+		return 0
+
+	if target is Object:
+		if target.has_method("discard_cards"):
+			return target.discard_cards(count)
+		if target.has_method("discard"):
+			return target.discard(count)
+
+	if target is Dictionary:
+		if target.has("hand") and target["hand"] is Array:
+			var hand_arr: Array = target["hand"]
+			var actual_discarded = 0
+			for _i in range(min(count, hand_arr.size())):
+				hand_arr.pop_back()
+				actual_discarded += 1
+			target["cards_discarded"] = target.get("cards_discarded", 0) + actual_discarded
+			return actual_discarded
+		else:
+			target["cards_discarded"] = target.get("cards_discarded", 0) + count
+			return count
+
+	if target is Array:
+		var discarded = 0
+		for _i in range(min(count, target.size())):
+			target.pop_back()
+			discarded += 1
+		return discarded
+
+	push_warning("[AbilityResolver] Cannot apply DISCARD_CARD (%d) to target of type %s: target missing discard_cards(), hand Array, or Array container." % [count, type_string(typeof(target))])
+	return 0
 
 
 func _apply_destroy(target: Variant) -> int:
+	if target == null:
+		return 0
+
 	if target is Object and target.has_method("destroy"):
 		target.destroy()
 		return 1
+
 	if target is Dictionary:
 		target["is_destroyed"] = true
 		target["def"] = 0
 		target["hp"] = 0
 		return 1
+
+	if target is Object:
+		if "is_destroyed" in target:
+			target.set("is_destroyed", true)
+			return 1
+		if target.has_method("queue_free"):
+			target.queue_free()
+			return 1
+
+	push_warning("[AbilityResolver] Cannot apply DESTROY to target of type %s: missing destroy() method, is_destroyed property, or queue_free." % type_string(typeof(target)))
 	return 0
 
 
 func _apply_swap_stats(target: Variant, stat_a: String, stat_b: String) -> int:
+	if target == null:
+		return 0
+
 	var a_key = stat_a.to_lower()
 	var b_key = stat_b.to_lower()
 	if target is Dictionary:
-		var val_a = target.get(a_key, 0)
-		var val_b = target.get(b_key, 0)
-		target[a_key] = val_b
-		target[b_key] = val_a
-		return 1
+		if target.has(a_key) and target.has(b_key):
+			var val_a = target.get(a_key, 0)
+			var val_b = target.get(b_key, 0)
+			target[a_key] = val_b
+			target[b_key] = val_a
+			return 1
+
 	if target is Object and a_key in target and b_key in target:
 		var val_a = target.get(a_key)
 		var val_b = target.get(b_key)
 		target.set(a_key, val_b)
 		target.set(b_key, val_a)
 		return 1
+
+	push_warning("[AbilityResolver] Cannot apply SWAP_STATS (%s <-> %s) to target of type %s: stats not found on target." % [stat_a, stat_b, type_string(typeof(target))])
 	return 0
 
 
