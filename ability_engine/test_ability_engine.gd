@@ -363,6 +363,62 @@ func dispatch_trigger(trigger_name: String, source: Variant = null, context: Var
 	immut_resolver.free()
 	print("AbilityResolver target mutation policy, immutable mode, and preview_effect_delta verified.")
 
+	# 14. Test Multi-Faction TargetScope Resolution for Arbitrary sides_count (1, 2, 3, N)
+	var multi_res = AbilityResolver.new()
+	var BoardGridScene = load("res://board_system/BoardGrid.tscn")
+	var multi_board = BoardGridScene.instantiate()
+	root.add_child(multi_board)
+
+	multi_board.sides_count = 3
+	multi_board.lanes_per_side = 2
+	multi_board.rebuild_grid()
+
+	var u_side0 = {"name": "Hero Side 0", "side": 0, "lane": 1, "def": 10}
+	var u_side1 = {"name": "Hero Side 1", "side": 1, "lane": 1, "def": 10}
+	var u_side2 = {"name": "Hero Side 2", "side": 2, "lane": 1, "def": 10}
+
+	multi_board.get_slot(0, 1).slot_data.primary_occupant = u_side0
+	multi_board.get_slot(1, 1).slot_data.primary_occupant = u_side1
+	multi_board.get_slot(2, 1).slot_data.primary_occupant = u_side2
+
+	# A. Test OPPOSING_LANE on 3-sided board
+	var opp_eff = EffectData.create_damage(3, EffectData.TargetScope.OPPOSING_LANE)
+	var opp_ctx_s0 = EffectContext.create(u_side0, 0, 1)
+	opp_ctx_s0.set_var("board_grid", multi_board)
+	var s0_targets = multi_res._resolve_targets(EffectData.TargetScope.OPPOSING_LANE, opp_ctx_s0)
+	assert(s0_targets.size() == 1 and s0_targets[0] == u_side1, "Side 0 OPPOSING_LANE must target Side 1 in 3-way rotation")
+
+	var opp_ctx_s2 = EffectContext.create(u_side2, 2, 1)
+	opp_ctx_s2.set_var("board_grid", multi_board)
+	var s2_targets = multi_res._resolve_targets(EffectData.TargetScope.OPPOSING_LANE, opp_ctx_s2)
+	assert(s2_targets.size() == 1 and s2_targets[0] == u_side0, "Side 2 OPPOSING_LANE must target Side 0 in 3-way rotation")
+
+	# B. Test ALL_ENEMY across multi-faction board
+	var all_enemy_ctx = EffectContext.create(u_side0, 0, 1)
+	all_enemy_ctx.set_var("board_grid", multi_board)
+	var enemies = multi_res._resolve_targets(EffectData.TargetScope.ALL_ENEMY, all_enemy_ctx)
+	assert(enemies.size() == 2, "ALL_ENEMY for Side 0 on 3-sided board must find 2 enemy units")
+	assert(u_side1 in enemies and u_side2 in enemies, "ALL_ENEMY must contain Side 1 and Side 2 units")
+	assert(not u_side0 in enemies, "ALL_ENEMY must NOT contain caster Side 0 unit")
+
+	# C. Test ALL_ENEMY with specific enemy_sides filter
+	all_enemy_ctx.set_var("enemy_sides", [2])
+	var filtered_enemies = multi_res._resolve_targets(EffectData.TargetScope.ALL_ENEMY, all_enemy_ctx)
+	assert(filtered_enemies.size() == 1 and filtered_enemies[0] == u_side2, "enemy_sides=[2] must filter strictly to Side 2")
+
+	# D. Test ALL_FRIENDLY with allied alliance sides
+	var friendly_ctx = EffectContext.create(u_side0, 0, 1)
+	friendly_ctx.set_var("board_grid", multi_board)
+	friendly_ctx.set_var("friendly_sides", [0, 1]) # 0 and 1 are allied against 2
+	var friends = multi_res._resolve_targets(EffectData.TargetScope.ALL_FRIENDLY, friendly_ctx)
+	assert(friends.size() == 2, "friendly_sides=[0, 1] must find 2 friendly units")
+	assert(u_side0 in friends and u_side1 in friends, "Friendly units must be Side 0 and Side 1")
+	assert(not u_side2 in friends, "Enemy Side 2 must not be in friendly units")
+
+	multi_res.free()
+	multi_board.free()
+	print("Multi-faction TargetScope resolution for arbitrary sides_count verified.")
+
 	print("==================================================")
 	print("ALL ABILITY ENGINE UNIT TESTS PASSED (100%)")
 	print("==================================================")

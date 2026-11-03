@@ -136,6 +136,14 @@ print(preview.mutated_state)   # {"name": "Golem", "def": 7, "max_def": 12}
 print(target_state.def)        # 12 (original dictionary remains untouched)
 ```
 
+### 6. Multi-Faction & Arbitrary Side Target Scopes
+
+`AbilityResolver` dynamically routes effects across arbitrary side counts (1, 2, 3, or N players):
+
+- **`OPPOSING_LANE`**: Resolves facing units using the board's `get_opposing_units()` or `get_opposing_side()`, falling back to deterministic modulo rotation (`(side + 1) % sides_count` for odd ring topologies, `(side + N/2) % N` for opposing cross layouts).
+- **`ALL_ENEMY` & `RANDOM_ENEMY`**: Automatically selects all occupants on any side different from `context.source_side`. Callers can provide `context.set_var("enemy_sides", [target_side])` to focus on specific hostile factions.
+- **`ALL_FRIENDLY` & `ADJACENT_FRIENDLY`**: Filters units belonging to `context.source_side`, or an allied team specified via `context.set_var("friendly_sides", [0, 1])`.
+
 ---
 
 ## API Reference

@@ -208,7 +208,60 @@ func _init() -> void:
 	assert(in_radius_u1.size() == 2, "Units within radius 1 should be Unit0 and Unit2")
 	print("Universal Spatial Topology Protocol (N7) verified on BoardGrid.")
 
+	# 11. Test Arbitrary sides_count, deterministic iteration, and configurable opposing logic
+	var multi_grid: BoardGrid = BoardGridScene.instantiate()
+	self.root.add_child(multi_grid)
+
+	# A. 1-sided solo board
+	multi_grid.sides_count = 1
+	multi_grid.lanes_per_side = 3
+	multi_grid.rebuild_grid()
+	assert(multi_grid.get_all_slots().size() == 3, "1 side * 3 lanes = 3 slots")
+	assert(multi_grid.get_opposing_side(0) == -1, "1-sided board has no opposing side")
+	assert(multi_grid.get_opposing_slot(multi_grid.get_slot(0, 0)) == null, "1-sided slot opposing slot is null")
+
+	# B. 3-sided board (3 factions in ring rotation)
+	multi_grid.sides_count = 3
+	multi_grid.lanes_per_side = 2
+	multi_grid.rebuild_grid()
+	assert(multi_grid.get_all_slots().size() == 6, "3 sides * 2 lanes = 6 slots")
+	assert(multi_grid.get_opposing_side(0) == 1, "Side 0 opposes Side 1 in 3-way rotation")
+	assert(multi_grid.get_opposing_side(1) == 2, "Side 1 opposes Side 2 in 3-way rotation")
+	assert(multi_grid.get_opposing_side(2) == 0, "Side 2 opposes Side 0 in 3-way rotation")
+	var s0_l1 = multi_grid.get_slot(0, 1)
+	var opp_s0_l1 = multi_grid.get_opposing_slot(s0_l1)
+	assert(opp_s0_l1 != null and opp_s0_l1.slot_data.side == 1 and opp_s0_l1.slot_data.lane_index == 1, "Slot (0, 1) opposes (1, 1)")
+
+	# C. 4-sided board (even cross sides: 0 opposes 2, 1 opposes 3)
+	multi_grid.sides_count = 4
+	multi_grid.lanes_per_side = 2
+	multi_grid.rebuild_grid()
+	assert(multi_grid.get_opposing_side(0) == 2, "Side 0 opposes Side 2 in 4-way cross")
+	assert(multi_grid.get_opposing_side(1) == 3, "Side 1 opposes Side 3 in 4-way cross")
+	assert(multi_grid.get_opposing_side(2) == 0, "Side 2 opposes Side 0 in 4-way cross")
+	assert(multi_grid.get_opposing_side(3) == 1, "Side 3 opposes Side 1 in 4-way cross")
+
+	# D. Custom opposing_side_resolver callback
+	multi_grid.opposing_side_resolver = func(s: int) -> int:
+		# Custom alliance mapping: 0 opposes 3, 1 opposes 2, 2 opposes 1, 3 opposes 0
+		var custom_map = {0: 3, 1: 2, 2: 1, 3: 0}
+		return custom_map.get(s, -1)
+	assert(multi_grid.get_opposing_side(0) == 3, "Custom resolver: 0 opposes 3")
+	assert(multi_grid.get_opposing_side(1) == 2, "Custom resolver: 1 opposes 2")
+	var s0_l0 = multi_grid.get_slot(0, 0)
+	assert(multi_grid.get_opposing_slot(s0_l0).slot_data.side == 3, "Custom resolver slot opposes side 3")
+
+	# E. Custom side_order deterministic iteration
+	multi_grid.side_order = [3, 2, 1, 0]
+	multi_grid.rebuild_grid()
+	var container = multi_grid.get_node("SidesContainer")
+	assert(container.get_child(0).name == "Side_3_Row", "First row should be Side_3_Row with custom side_order")
+	assert(container.get_child(3).name == "Side_0_Row", "Last row should be Side_0_Row with custom side_order")
+
+	multi_grid.free()
 	grid_inst.free()
+	print("Arbitrary sides_count (1, 2, 3, 4, N) and configurable opposing logic verified.")
+
 	print("==================================================")
 	print("ALL BOARD & LANE SYSTEM UNIT TESTS PASSED (100%)")
 	print("==================================================")

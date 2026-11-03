@@ -194,19 +194,31 @@ func _resolve_targets(scope: EffectData.TargetScope, context: EffectContext) -> 
 			if friendly_list is Array:
 				return friendly_list.duplicate()
 
+			var friendly_sides = context.get_var("friendly_sides")
+
 			# 2. Board Grid provider
 			var grid = context.get_var("board_grid", context.get_var("board"))
 			if grid != null and grid.has_method("get_occupied_slots"):
-				var slots = grid.get_occupied_slots(context.source_side)
 				var units: Array = []
-				for s in slots:
-					units.append(s.slot_data.primary_occupant if s.slot_data and s.slot_data.has_primary() else s)
+				if friendly_sides is Array:
+					for f_side in friendly_sides:
+						var slots = grid.get_occupied_slots(int(f_side))
+						for s in slots:
+							units.append(s.slot_data.primary_occupant if s.slot_data and s.slot_data.has_primary() else s)
+				else:
+					var slots = grid.get_occupied_slots(context.source_side)
+					for s in slots:
+						units.append(s.slot_data.primary_occupant if s.slot_data and s.slot_data.has_primary() else s)
 				return units
 
 			# 3. Filter targets pool by friendly side
 			var matched: Array = []
 			for t in context.targets:
-				if _get_entity_side(t, context.source_side) == context.source_side:
+				var t_side = _get_entity_side(t, context.source_side)
+				if friendly_sides is Array:
+					if t_side in friendly_sides:
+						matched.append(t)
+				elif t_side == context.source_side:
 					matched.append(t)
 			if not matched.is_empty():
 				return matched
@@ -218,21 +230,33 @@ func _resolve_targets(scope: EffectData.TargetScope, context: EffectContext) -> 
 			if enemy_list is Array:
 				return enemy_list.duplicate()
 
+			var enemy_sides = context.get_var("enemy_sides")
+
 			# 2. Board Grid provider
 			var grid = context.get_var("board_grid", context.get_var("board"))
 			if grid != null and grid.has_method("get_occupied_slots"):
 				var slots = grid.get_occupied_slots(-1)
 				var units: Array = []
 				for s in slots:
-					if s.slot_data and s.slot_data.side != context.source_side:
-						units.append(s.slot_data.primary_occupant if s.slot_data.has_primary() else s)
+					if s.slot_data:
+						var s_side = s.slot_data.side
+						if enemy_sides is Array:
+							if s_side in enemy_sides:
+								units.append(s.slot_data.primary_occupant if s.slot_data.has_primary() else s)
+						elif s_side != context.source_side:
+							units.append(s.slot_data.primary_occupant if s.slot_data.has_primary() else s)
 				return units
 
 			# 3. Filter targets pool by opposing side
 			var matched: Array = []
 			for t in context.targets:
-				if _get_entity_side(t, -1) != -1 and _get_entity_side(t) != context.source_side:
-					matched.append(t)
+				var t_side = _get_entity_side(t, -1)
+				if t_side != -1:
+					if enemy_sides is Array:
+						if t_side in enemy_sides:
+							matched.append(t)
+					elif t_side != context.source_side:
+						matched.append(t)
 			if not matched.is_empty():
 				return matched
 			return context.targets.duplicate()
@@ -269,23 +293,46 @@ func _resolve_targets(scope: EffectData.TargetScope, context: EffectContext) -> 
 			var board = context.get_var("board", context.get_var("board_grid"))
 			if board != null and board.has_method("get_opposing_units"):
 				var origin = context.source if context.source != null else context.get_coordinate()
-				return board.get_opposing_units(origin)
-			elif board != null and board.has_method("get_opposing_slot"):
+				var opp_units = board.get_opposing_units(origin)
+				if not opp_units.is_empty():
+					return opp_units
+			if board != null and board.has_method("get_opposing_slot"):
 				var cur_slot = board.get_slot(context.source_side, context.source_lane)
 				if cur_slot != null:
 					var opp_slot = board.get_opposing_slot(cur_slot)
 					if opp_slot != null and opp_slot.slot_data and not opp_slot.slot_data.is_empty():
 						return [opp_slot.slot_data.primary_occupant if opp_slot.slot_data.has_primary() else opp_slot]
 			elif board != null and board.has_method("get_slot"):
-				var opp_side = 1 - context.source_side if board.get("sides_count") == 2 else (context.source_side + 1)
-				var opp_slot = board.get_slot(opp_side, context.source_lane)
-				if opp_slot != null and opp_slot.slot_data and not opp_slot.slot_data.is_empty():
-					return [opp_slot.slot_data.primary_occupant if opp_slot.slot_data.has_primary() else opp_slot]
+				var opp_side = -1
+				if board.has_method("get_opposing_side"):
+					opp_side = board.get_opposing_side(context.source_side)
+				else:
+					var total_sides = int(board.get("sides_count")) if "sides_count" in board else 2
+					if total_sides <= 1:
+						opp_side = -1
+					elif total_sides % 2 == 0:
+						opp_side = (context.source_side + total_sides / 2) % total_sides
+					else:
+						opp_side = (context.source_side + 1) % total_sides
+				if opp_side >= 0:
+					var opp_slot = board.get_slot(opp_side, context.source_lane)
+					if opp_slot != null and opp_slot.slot_data and not opp_slot.slot_data.is_empty():
+						return [opp_slot.slot_data.primary_occupant if opp_slot.slot_data.has_primary() else opp_slot]
 
 			# 2. Candidate pool filtering
+			var opp_side_target = -1
+			if board != null and board.has_method("get_opposing_side"):
+				opp_side_target = board.get_opposing_side(context.source_side)
+
 			for t in context.targets:
-				if _get_entity_side(t, -1) != context.source_side and _get_entity_lane(t) == context.source_lane:
-					return [t]
+				var t_side = _get_entity_side(t, -1)
+				var t_lane = _get_entity_lane(t)
+				if t_lane == context.source_lane:
+					if opp_side_target >= 0:
+						if t_side == opp_side_target:
+							return [t]
+					elif t_side != -1 and t_side != context.source_side:
+						return [t]
 			return []
 
 		EffectData.TargetScope.RANDOM_ENEMY:

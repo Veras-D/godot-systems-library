@@ -32,6 +32,16 @@ signal grid_rebuilt()
 @export var slot_spacing: int = 12
 @export var universal_affinity_tag: String = "Universal"
 
+## Custom display/iteration order for sides. If empty, iterates all sides deterministically: 0, 1, ..., sides_count - 1.
+@export var side_order: Array[int] = []:
+	set(val):
+		side_order = val
+		if is_inside_tree():
+			rebuild_grid()
+
+## Optional custom callable to determine opposing side index: func(current_side: int) -> int
+var opposing_side_resolver: Callable = Callable()
+
 ## Optional custom affinity validator hook: func(occupant_affinity: String, slot_affinity: String) -> bool
 var custom_affinity_validator: Callable = Callable():
 	set(val):
@@ -61,22 +71,25 @@ func rebuild_grid() -> void:
 
 	# Clear previous children
 	for child in sides_container.get_children():
+		sides_container.remove_child(child)
 		child.queue_free()
 	_slots_map.clear()
 	_selected_slot = null
 
-	# Create rows for each side
-	# For standard 2-player opposing layouts:
-	# Side 1 (Opponent) is at the top, Side 0 (Player) is at the bottom.
-	# We iterate backwards through sides so higher side indices render on top if side_count == 2.
-	var side_order: Array[int] = []
-	if sides_count == 2:
-		side_order = [1, 0] # Top = Side 1, Bottom = Side 0
+	# Iterate all sides in deterministic order without special-casing 2
+	var effective_order: Array[int] = []
+	if not side_order.is_empty():
+		for s in side_order:
+			if s >= 0 and s < sides_count and not s in effective_order:
+				effective_order.append(s)
+		for s in range(sides_count):
+			if not s in effective_order:
+				effective_order.append(s)
 	else:
 		for s in range(sides_count):
-			side_order.append(s)
+			effective_order.append(s)
 
-	for side_idx in side_order:
+	for side_idx in effective_order:
 		var row_box = HBoxContainer.new()
 		row_box.name = "Side_%d_Row" % side_idx
 		row_box.add_theme_constant_override("separation", slot_spacing)
@@ -129,15 +142,32 @@ func get_slot(side: int, lane: int) -> BoardSlot:
 	return _slots_map.get(Vector2i(side, lane), null)
 
 
+## Determines opposing side for a given side index.
+## Uses custom resolver callback if provided; otherwise computes deterministic modulo rotation.
+func get_opposing_side(side: int) -> int:
+	if opposing_side_resolver.is_valid():
+		var res = opposing_side_resolver.call(side)
+		return int(res)
+	if sides_count <= 1:
+		return -1
+	# Modulo rotation for arbitrary N sides:
+	# Even sides (e.g. 2, 4, 6): across = (side + sides_count / 2) % sides_count.
+	# For sides_count = 2, this yields: 0 -> 1, 1 -> 0.
+	# For sides_count = 4, this yields: 0 -> 2, 1 -> 3, 2 -> 0, 3 -> 1.
+	# Odd sides (e.g. 3): next opposing in rotation = (side + 1) % sides_count.
+	if sides_count % 2 == 0:
+		return (side + sides_count / 2) % sides_count
+	return (side + 1) % sides_count
+
+
 ## Retrieve the directly opposite slot (e.g. for lane combat resolution)
-## In a 2-sided board, Side 0 lane X opposes Side 1 lane X.
 func get_opposing_slot(slot: BoardSlot) -> BoardSlot:
 	if slot == null or slot.slot_data == null:
 		return null
 	var cur_side = slot.slot_data.side
 	var cur_lane = slot.slot_data.lane_index
-	if sides_count == 2:
-		var opp_side = 1 if cur_side == 0 else 0
+	var opp_side = get_opposing_side(cur_side)
+	if opp_side >= 0 and opp_side < sides_count:
 		return get_slot(opp_side, cur_lane)
 	return null
 

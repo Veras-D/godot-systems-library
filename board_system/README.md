@@ -103,7 +103,26 @@ func execute_lane_combat(attacker_slot: BoardSlot) -> void:
         attacker_slot.play_damage_shake(4.0, 0.15)
 ```
 
-### 4. Audio & VFX Animation Signal Hooks
+### 4. Multi-Side Boards & Configurable Opposing Logic (1, 2, 3, or N Factions)
+
+`BoardGrid` supports arbitrary side counts for solo games (`sides_count = 1`), 2-player battles (`sides_count = 2`), free-for-all games (`sides_count = 3`), or team alliances (`sides_count = 4`+):
+
+- **Deterministic Iteration**: `rebuild_grid()` builds rows for all sides (`0..sides_count - 1`) without assuming 2 players. Use `@export var side_order: Array[int]` to customize visual row rendering (e.g. `[1, 0]` for 2-player top/bottom).
+- **Opposing Side Calculation**: `get_opposing_side(side)` uses deterministic modulo rotation by default (even sides face across: `(s + N/2) % N`; odd sides rotate clockwise: `(s + 1) % N`).
+- **Custom Opposing Callback**: Assign `board_grid.opposing_side_resolver = func(s): return custom_mapping[s]` to support asymmetrical team configurations or dynamic aggro targeting.
+
+```gdscript
+# 3-player Free-For-All setup
+board_grid.sides_count = 3
+board_grid.lanes_per_side = 4
+board_grid.rebuild_grid()
+
+print(board_grid.get_opposing_side(0)) # 1
+print(board_grid.get_opposing_side(1)) # 2
+print(board_grid.get_opposing_side(2)) # 0
+```
+
+### 5. Audio & VFX Animation Signal Hooks
 
 `BoardGrid` bubbles up animation events, allowing audio jukeboxes or screen shake handlers to react without coupling:
 
@@ -135,11 +154,16 @@ board_grid.slot_summon_pulsed.connect(func(slot):
 ## API Reference
 
 ### `BoardGrid`
-| Method | Description |
+| Method / Property | Description |
 | :--- | :--- |
+| `sides_count: int` | Number of sides/factions (1, 2, 3, or N). Default 2. |
+| `lanes_per_side: int` | Number of lane slots per side. Default 4. |
+| `side_order: Array[int]` | Custom row display order. Defaults to deterministic `[0, 1, ..., N-1]`. |
+| `opposing_side_resolver: Callable` | Optional custom callback `func(side: int) -> int`. |
 | `rebuild_grid()` | Reconstructs the visual and logical slot matrix. |
+| `get_opposing_side(side: int) -> int` | Determines opposing side index via resolver or modulo rotation. |
 | `get_slot(side: int, lane: int) -> BoardSlot` | Returns the slot at coordinate `(side, lane)`. |
-| `get_opposing_slot(slot: BoardSlot) -> BoardSlot` | Returns the directly opposite slot on the other side. |
+| `get_opposing_slot(slot: BoardSlot) -> BoardSlot` | Returns the directly opposite slot using `get_opposing_side()`. |
 | `get_all_slots(side: int = -1) -> Array[BoardSlot]` | Returns all slots, optionally filtered by side. |
 | `get_empty_slots(side: int = -1) -> Array[BoardSlot]` | Returns all unoccupied slots. |
 | `get_occupied_slots(side: int = -1) -> Array[BoardSlot]` | Returns all slots with a primary occupant. |
