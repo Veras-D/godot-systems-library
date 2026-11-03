@@ -16,6 +16,7 @@ class WheelResult extends RefCounted:
 	const KEY_ANGLE = "angle_deg"
 	const KEY_COLOR = "color"
 	const KEY_IS_SUCCESS = "is_success"
+	const KEY_QUICK_RESOLVED = "quick_resolved"
 
 	var id: String = ID_SUCCESS
 	var name: String = "SUCCESS"
@@ -23,6 +24,7 @@ class WheelResult extends RefCounted:
 	var angle_deg: float = 0.0
 	var color: Color = Color.WHITE
 	var is_success: bool = true
+	var quick_resolved: bool = false
 
 	static func from_dict(d: Dictionary) -> WheelResult:
 		var r = WheelResult.new()
@@ -32,6 +34,7 @@ class WheelResult extends RefCounted:
 		r.angle_deg = float(d.get(KEY_ANGLE, 0.0))
 		r.color = d.get(KEY_COLOR, Color.WHITE)
 		r.is_success = d.get(KEY_IS_SUCCESS, true)
+		r.quick_resolved = d.get(KEY_QUICK_RESOLVED, false)
 		return r
 
 	func to_dict() -> Dictionary:
@@ -41,8 +44,20 @@ class WheelResult extends RefCounted:
 			KEY_MULTIPLIER: multiplier,
 			KEY_ANGLE: angle_deg,
 			KEY_COLOR: color,
-			KEY_IS_SUCCESS: is_success
+			KEY_IS_SUCCESS: is_success,
+			KEY_QUICK_RESOLVED: quick_resolved
 		}
+
+	func _get(property: StringName) -> Variant:
+		match property:
+			&"id": return id
+			&"name": return name
+			&"multiplier": return multiplier
+			&"angle_deg": return angle_deg
+			&"color": return color
+			&"is_success": return is_success
+			&"quick_resolved": return quick_resolved
+		return null
 
 var sectors: Array = []
 var spin_speed_deg_sec: float = 1600.0
@@ -142,32 +157,44 @@ static func create_custom(p_sectors: Array, speed: float = 1600.0) -> WheelConfi
 	cfg.spin_speed_deg_sec = speed
 	return cfg
 
-func get_sector_at_angle(angle_deg: float) -> Dictionary:
+## Returns the resolved sector at the given angle as a typed WheelResult.
+func get_sector_at_angle(angle_deg: float) -> WheelResult:
 	var norm_angle = fposmod(angle_deg, 360.0)
 	var current_deg = 0.0
 	for sector in sectors:
 		var sector_span = sector.get("ratio", 0.0) * 360.0
 		if norm_angle >= current_deg and norm_angle < (current_deg + sector_span):
-			var res = sector.duplicate()
-			res["angle_deg"] = norm_angle
-			return res
+			var res_dict = sector.duplicate()
+			res_dict["angle_deg"] = norm_angle
+			return WheelResult.from_dict(res_dict)
 		current_deg += sector_span
 	if not sectors.is_empty():
-		var res = sectors[-1].duplicate()
-		res["angle_deg"] = norm_angle
-		return res
-	return {}
+		var res_dict = sectors[-1].duplicate()
+		res_dict["angle_deg"] = norm_angle
+		return WheelResult.from_dict(res_dict)
+	return WheelResult.new()
 
-func roll_quick_resolve() -> Dictionary:
+## Returns the resolved sector at the given angle as a dictionary.
+func get_sector_at_angle_dict(angle_deg: float) -> Dictionary:
+	return get_sector_at_angle(angle_deg).to_dict()
+
+## Deterministically rolls a quick resolution outcome as a typed WheelResult.
+func roll_quick_resolve() -> WheelResult:
 	var roll = randf()
 	var accum = 0.0
 	for sector in sectors:
 		accum += sector.get("ratio", 0.0)
 		if roll <= accum:
-			var res = sector.duplicate()
-			res["angle_deg"] = accum * 360.0
-			res["quick_resolved"] = true
-			return res
+			var res_dict = sector.duplicate()
+			res_dict["angle_deg"] = accum * 360.0
+			res_dict["quick_resolved"] = true
+			return WheelResult.from_dict(res_dict)
 	if not sectors.is_empty():
-		return sectors[-1].duplicate()
-	return {}
+		var res_dict = sectors[-1].duplicate()
+		res_dict["quick_resolved"] = true
+		return WheelResult.from_dict(res_dict)
+	return WheelResult.new()
+
+## Deterministically rolls a quick resolution outcome as a dictionary.
+func roll_quick_resolve_dict() -> Dictionary:
+	return roll_quick_resolve().to_dict()

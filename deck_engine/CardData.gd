@@ -28,7 +28,7 @@ static func create(
 	p_desc: String = "",
 	p_meta: Dictionary = {},
 	p_cat: String = "Standard"
-) -> Resource:
+) -> CardData:
 	var c = new()
 	c.id = p_id
 	c.name = p_name

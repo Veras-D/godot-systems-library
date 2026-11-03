@@ -42,7 +42,7 @@ func start_spin() -> void:
 	if config.quick_resolve:
 		var q_res = config.roll_quick_resolve()
 		state = State.RESOLVED
-		spin_completed.emit(q_res)
+		spin_completed.emit(q_res.to_dict())
 		return
 
 	state = State.SPINNING
@@ -66,9 +66,9 @@ func quick_resolve() -> Dictionary:
 	if config == null:
 		return {}
 	var res = config.roll_quick_resolve()
-	current_angle_deg = res.get("angle_deg", 0.0)
+	current_angle_deg = res.angle_deg
 	_resolve_final_result()
-	return res
+	return res.to_dict()
 
 func _process(delta: float) -> void:
 	if state == State.SPINNING:
@@ -92,16 +92,16 @@ func _check_sector_tick() -> void:
 	if config == null:
 		return
 	var cur_sector = config.get_sector_at_angle(current_angle_deg)
-	var s_id = cur_sector.get("id", "")
+	var s_id = cur_sector.id
 	if s_id != _last_sector_id and s_id != "":
 		_last_sector_id = s_id
-		sector_crossed.emit(cur_sector)
+		sector_crossed.emit(cur_sector.to_dict())
 
 func _resolve_final_result() -> void:
 	state = State.RESOLVED
 	var result = config.get_sector_at_angle(current_angle_deg)
-	result["angle_deg"] = current_angle_deg
-	spin_completed.emit(result)
+	result.angle_deg = current_angle_deg
+	spin_completed.emit(result.to_dict())
 	queue_redraw()
 
 
@@ -109,9 +109,9 @@ func _resolve_final_result() -> void:
 func get_last_result() -> WheelConfig.WheelResult:
 	if config == null:
 		return WheelConfig.WheelResult.new()
-	var raw = config.get_sector_at_angle(current_angle_deg)
-	raw["angle_deg"] = current_angle_deg
-	return WheelConfig.WheelResult.from_dict(raw)
+	var res = config.get_sector_at_angle(current_angle_deg)
+	res.angle_deg = current_angle_deg
+	return res
 
 func _on_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:

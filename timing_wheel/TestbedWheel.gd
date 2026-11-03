@@ -172,7 +172,7 @@ func _run_batch_simulation() -> void:
 
 	for _i in range(count):
 		var res = current_cfg.roll_quick_resolve()
-		var s_id = res.get("id", "")
+		var s_id = res.id
 		if counts.has(s_id):
 			counts[s_id] += 1
 

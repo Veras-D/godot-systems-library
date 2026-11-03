@@ -20,7 +20,7 @@ static func create(
 	p_targets: Array = [],
 	p_trigger: String = "",
 	p_source_coord: Variant = null
-) -> RefCounted:
+) -> EffectContext:
 	var ctx = new()
 	ctx.source = p_source
 	ctx.source_side = p_source_side

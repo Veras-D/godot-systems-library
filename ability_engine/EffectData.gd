@@ -36,7 +36,7 @@ enum TargetScope {
 @export var custom_handler_id: String = ""    # For CUSTOM type handlers
 
 
-static func create_damage(p_amount: int, p_target: TargetScope = TargetScope.TARGET_SINGLE) -> Resource:
+static func create_damage(p_amount: int, p_target: TargetScope = TargetScope.TARGET_SINGLE) -> EffectData:
 	var eff = new()
 	eff.type = EffectType.DAMAGE
 	eff.amount = p_amount
@@ -44,7 +44,7 @@ static func create_damage(p_amount: int, p_target: TargetScope = TargetScope.TAR
 	return eff
 
 
-static func create_heal(p_amount: int, p_target: TargetScope = TargetScope.SELF) -> Resource:
+static func create_heal(p_amount: int, p_target: TargetScope = TargetScope.SELF) -> EffectData:
 	var eff = new()
 	eff.type = EffectType.HEAL
 	eff.amount = p_amount
@@ -57,7 +57,7 @@ static func create_buff(
 	p_amount: int,
 	p_target: TargetScope = TargetScope.SELF,
 	p_duration: int = 0
-) -> Resource:
+) -> EffectData:
 	var eff = new()
 	eff.type = EffectType.BUFF_STAT
 	eff.stat_name = p_stat
@@ -67,7 +67,7 @@ static func create_buff(
 	return eff
 
 
-static func create_resource_gain(p_amount: int) -> Resource:
+static func create_resource_gain(p_amount: int) -> EffectData:
 	var eff = new()
 	eff.type = EffectType.GAIN_RESOURCE
 	eff.amount = p_amount
@@ -75,7 +75,7 @@ static func create_resource_gain(p_amount: int) -> Resource:
 	return eff
 
 
-static func create_draw(p_count: int) -> Resource:
+static func create_draw(p_count: int) -> EffectData:
 	var eff = new()
 	eff.type = EffectType.DRAW_CARD
 	eff.amount = p_count
@@ -83,7 +83,7 @@ static func create_draw(p_count: int) -> Resource:
 	return eff
 
 
-static func create_discard(p_count: int, p_target: TargetScope = TargetScope.SELF) -> Resource:
+static func create_discard(p_count: int, p_target: TargetScope = TargetScope.SELF) -> EffectData:
 	var eff = new()
 	eff.type = EffectType.DISCARD_CARD
 	eff.amount = p_count

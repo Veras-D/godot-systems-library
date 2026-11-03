@@ -90,7 +90,7 @@ func _on_wheel_result(result: Dictionary) -> void:
 
 ### 4. Typed Result Contract (`WheelResult`)
 
-In addition to dictionary access, outcomes can be consumed via the typed `WheelConfig.WheelResult` class:
+Outcomes from `wheel.get_last_result()`, `config.get_sector_at_angle()`, and `config.roll_quick_resolve()` return typed `WheelConfig.WheelResult` instances with full GDScript static type safety:
 
 ```gdscript
 var outcome: WheelConfig.WheelResult = wheel.get_last_result()
@@ -98,6 +98,11 @@ if outcome.id == WheelConfig.ID_PARTIAL:
     print("Bonus multiplier: ", outcome.multiplier)
 elif outcome.id == WheelConfig.ID_SUCCESS:
     print("Standard success: ", outcome.multiplier)
+
+# Dict access or serialization:
+var outcome_dict: Dictionary = outcome.to_dict()
+# Or direct dictionary methods on config:
+var dict_res = config.roll_quick_resolve_dict()
 ```
 
 Generic outcome constants available: `WheelConfig.ID_SUCCESS`, `WheelConfig.ID_PARTIAL`, `WheelConfig.ID_FAILURE`.

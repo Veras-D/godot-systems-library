@@ -17,6 +17,7 @@ func _init() -> void:
 	# Success: 36.0° to 36.0 + 252.0 = 288.0°
 	# Failure: 288.0° to 360°
 	var s_bonus = cfg.get_sector_at_angle(10.0)
+	assert(s_bonus is WheelConfig.WheelResult, "get_sector_at_angle should return typed WheelResult")
 	assert(s_bonus.id == WheelConfig.ID_PARTIAL, "10° should be in bonus sector")
 	print("10° check: ", s_bonus.name, " multiplier: ", s_bonus.multiplier)
 
@@ -33,6 +34,7 @@ func _init() -> void:
 	var counts = { WheelConfig.ID_PARTIAL: 0, WheelConfig.ID_SUCCESS: 0, WheelConfig.ID_FAILURE: 0 }
 	for _i in range(rolls):
 		var r = cfg.roll_quick_resolve()
+		assert(r is WheelConfig.WheelResult, "roll_quick_resolve must return typed WheelResult")
 		counts[r.id] += 1
 
 	var bonus_pct = (float(counts[WheelConfig.ID_PARTIAL]) / float(rolls)) * 100.0

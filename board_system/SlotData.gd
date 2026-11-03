@@ -39,7 +39,7 @@ var attached_occupant: Variant = null:     # Secondary occupant (e.g. Building, 
 		occupant_changed.emit(self)
 
 
-static func create(p_side: int, p_lane: int, p_affinity: String = "") -> Resource:
+static func create(p_side: int, p_lane: int, p_affinity: String = "") -> SlotData:
 	var slot = new()
 	slot.side = p_side
 	slot.lane_index = p_lane

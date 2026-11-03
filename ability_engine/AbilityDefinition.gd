@@ -21,7 +21,7 @@ static func create(
 	p_trigger: String = "ON_ACTIVATE",
 	p_effects: Array = [],
 	p_desc: String = ""
-) -> Resource:
+) -> AbilityDefinition:
 	var ab = new()
 	ab.id = p_id
 	ab.name = p_name
