@@ -54,7 +54,7 @@ flowchart TD
 
 ## 📋 Universal Save Schema Standard (v1)
 
-While `SaveVault` supports any dictionary payload, consuming games should conform to this canonical top-level schema standard:
+While `SaveVault` supports any dictionary payload, consuming games should conform to this canonical top-level schema standard enforced by `validate_v1_schema()`. Payloads should include at least one canonical state container (`player`, `inventory`, `campaign`, `settings`, `game_data`, `player_data`, or `system_states`):
 
 ```json
 {
@@ -91,11 +91,11 @@ While `SaveVault` supports any dictionary payload, consuming games should confor
 
 ### 1. Basic Save & Load
 
+> [!NOTE]
+> Examples use relative preloads; adjust paths to match wherever you installed or cloned the module folder in your project.
+
 ```gdscript
-# Example path when included as a submodule in a host project (e.g. res://src/systems/ or res://addons/):
-const SaveVault = preload("res://src/systems/save_vault/SaveVault.gd")
-# Or if placed directly at your project root:
-# const SaveVault = preload("res://save_vault/SaveVault.gd")
+const SaveVault = preload("SaveVault.gd")
 
 var vault: SaveVault
 
@@ -104,18 +104,22 @@ func _ready() -> void:
     add_child(vault)
 
 func save_game(slot_name: String) -> void:
-    var player_data = {
-        "player_name": "Finn",
-        "level": 10,
-        "inventory": ["Demon Sword", "Pie"]
+    var save_data = {
+        "player": {
+            "name": "Adventurer",
+            "level": 10
+        },
+        "inventory": {
+            "items": ["Demon Sword", "Pie"]
+        }
     }
-    var preview = {"player_name": "Finn", "level": 10}
-    vault.save_slot(slot_name, player_data, preview)
+    var preview = {"name": "Adventurer", "level": 10}
+    vault.save_slot(slot_name, save_data, preview)
 
 func load_game(slot_name: String) -> void:
     var data = vault.load_slot(slot_name)
     if not data.is_empty():
-        print("Loaded player: ", data["player_name"])
+        print("Loaded player: ", data.get("player", {}).get("name", "Unknown"))
 ```
 
 ### 2. Version Migrations

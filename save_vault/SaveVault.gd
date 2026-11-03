@@ -42,9 +42,11 @@ func register_migration(target_version: int, migration_callable: Callable) -> vo
 
 ## Validates a save dictionary against Universal Schema v1 recommendations
 static func validate_v1_schema(data: Dictionary) -> Dictionary:
-	if not data.has("game_data") and not data.has("player_data") and not data.has("system_states"):
-		return {"valid": false, "error": "Save payload must contain at least one state container ('game_data', 'player_data', or 'system_states')"}
-	return {"valid": true, "error": ""}
+	var valid_keys = ["game_data", "player_data", "system_states", "player", "inventory", "campaign", "settings", "meta"]
+	for k in valid_keys:
+		if data.has(k):
+			return {"valid": true, "error": ""}
+	return {"valid": false, "error": "Save payload must contain at least one state container ('player', 'inventory', 'campaign', 'settings', 'game_data', 'player_data', or 'system_states')"}
 
 
 ## Saves data into a specified slot atomically

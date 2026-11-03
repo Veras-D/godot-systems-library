@@ -34,13 +34,13 @@ Designed following the **Systems-First** architecture: zero game-specific coupli
 
 ### 1. Adding BoardGrid to Your Scene
 
+> [!NOTE]
+> Examples use relative preloads; adjust paths to match wherever you installed or cloned the module folder in your project.
+
 Instantiate `BoardGrid.tscn` in your battle or board UI:
 
 ```gdscript
-# Example path when included as a submodule in a host project (e.g. res://src/systems/ or res://addons/):
-const BoardGrid = preload("res://src/systems/board_system/BoardGrid.gd")
-# Or if placed directly at your project root:
-# const BoardGrid = preload("res://board_system/BoardGrid.gd")
+const BoardGrid = preload("BoardGrid.gd")
 
 @onready var board_grid: BoardGrid = $BoardGrid
 

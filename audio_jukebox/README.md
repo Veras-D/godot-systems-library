@@ -30,16 +30,20 @@ Designed following the **Systems-First** architecture: zero game-specific coupli
 
 ## Integration Guide
 
+> [!NOTE]
+> Examples use relative preloads; adjust paths to match wherever you installed or cloned the module folder in your project.
+
 ### 1. Instantiate or Autoload
 In your scene or as an Autoload singleton (`AudioManager`):
 ```gdscript
+const AudioManager = preload("AudioManager.gd")
 var audio_mgr = AudioManager.new()
 add_child(audio_mgr)
 ```
 
 ### 2. Play & Crossfade BGM
 ```gdscript
-var battle_bgm = preload("res://assets/audio/battle_theme.ogg")
+var battle_bgm = preload("battle_theme.ogg") # Adjust path to your audio asset
 
 # Smoothly crossfade to battle theme over 1.5 seconds
 audio_mgr.play_bgm(battle_bgm, 1.5)
@@ -50,7 +54,7 @@ audio_mgr.stop_bgm(1.0)
 
 ### 3. Play Pooled SFX
 ```gdscript
-var click_sfx = preload("res://assets/audio/click.wav")
+var click_sfx = preload("click.wav") # Adjust path to your audio asset
 
 # Play standard SFX
 audio_mgr.play_sfx(click_sfx)

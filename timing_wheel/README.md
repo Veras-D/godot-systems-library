@@ -29,9 +29,15 @@ Designed following the **Systems-First** architecture: zero project-specific cou
 
 ## Quick Start / Integration
 
+> [!NOTE]
+> Examples use relative preloads; adjust paths to match wherever you installed or cloned the module folder in your project.
+
 ### 1. Instantiate the Spinner
 ```gdscript
-var wheel_scene = preload("res://timing_wheel/WheelSpinner.tscn") # Or your chosen folder path
+const WheelSpinner = preload("WheelSpinner.gd")
+const WheelConfig = preload("WheelConfig.gd")
+
+var wheel_scene = preload("WheelSpinner.tscn")
 var wheel = wheel_scene.instantiate() as WheelSpinner
 add_child(wheel)
 ```

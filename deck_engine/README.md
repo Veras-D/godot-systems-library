@@ -67,16 +67,24 @@ $$\text{norm}_i = \frac{i}{N - 1} - 0.5 \quad \in [-0.5, +0.5]$$
 
 ## Integration Guide
 
+> [!NOTE]
+> Examples use relative preloads; adjust paths to match wherever you installed or cloned the module folder in your project.
+
 ### 1. Instantiate Deck & Hand
 ```gdscript
+const Deck = preload("Deck.gd")
+const HandManager = preload("HandManager.gd")
+
 var deck = Deck.new()
-var hand_scene = preload("res://deck_engine/HandManager.tscn")
+var hand_scene = preload("HandManager.tscn")
 var hand = hand_scene.instantiate() as HandManager
 add_child(hand)
 ```
 
 ### 2. Populate Deck & Draw
 ```gdscript
+const CardData = preload("CardData.gd")
+
 # Creates a Fire affinity card:
 var card = CardData.create("c_01", "Flame Dragon", 3, "Creature", "Fire", 6, 8, "Spits fire")
 deck.add_card(card)
@@ -99,7 +107,9 @@ hand.card_clicked.connect(func(card_view: GenericCardView):
 
 ### 4. Dynamic Card View Updates (`GenericCardView`)
 ```gdscript
-var card_view_scene = preload("res://deck_engine/GenericCardView.tscn")
+const GenericCardView = preload("GenericCardView.gd")
+
+var card_view_scene = preload("GenericCardView.tscn")
 var card_view = card_view_scene.instantiate() as GenericCardView
 add_child(card_view)
 

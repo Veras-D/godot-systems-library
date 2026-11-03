@@ -50,12 +50,12 @@ flowchart TD
 
 ### 1. Defining an Ability
 
+> [!NOTE]
+> Examples use relative preloads; adjust paths to match wherever you installed or cloned the module folder in your project.
+
 ```gdscript
-# Example path when included as a submodule in a host project (e.g. res://src/systems/ or res://addons/):
-const EffectData = preload("res://src/systems/ability_engine/EffectData.gd")
-const AbilityDefinition = preload("res://src/systems/ability_engine/AbilityDefinition.gd")
-# Or if placed directly at your project root:
-# const EffectData = preload("res://ability_engine/EffectData.gd")
+const EffectData = preload("EffectData.gd")
+const AbilityDefinition = preload("AbilityDefinition.gd")
 
 # Create a spell that deals 5 damage to target and heals caster for 3
 var fireball = AbilityDefinition.create(
@@ -72,8 +72,8 @@ var fireball = AbilityDefinition.create(
 ### 2. Enqueuing and Resolving
 
 ```gdscript
-const EffectContext = preload("res://src/systems/ability_engine/EffectContext.gd")
-const AbilityResolver = preload("res://src/systems/ability_engine/AbilityResolver.gd")
+const EffectContext = preload("EffectContext.gd")
+const AbilityResolver = preload("AbilityResolver.gd")
 
 @onready var resolver: AbilityResolver = $AbilityResolver
 
@@ -105,7 +105,7 @@ resolver.dispatch_trigger("ON_DAMAGE_TAKEN", defender_unit, reaction_context)
 Connect game events automatically to the ability engine without coupling your gameplay controllers:
 
 ```gdscript
-const SystemEventBus = preload("res://src/systems/ability_engine/SystemEventBus.gd")
+const SystemEventBus = preload("SystemEventBus.gd")
 
 var event_bus = SystemEventBus.new()
 event_bus.connect_resolver(resolver)

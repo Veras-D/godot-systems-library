@@ -104,6 +104,17 @@ func _init() -> void:
 	var loaded_valid = vault.load_profile("profile_valid")
 	assert(loaded_valid.get("game_data").get("score") == 900, "load_profile alias must load saved data")
 
+	# Test canonical README schema containers (player, inventory, campaign, settings)
+	var readme_payload = {
+		"player": {"level": 14, "name": "Hero_01"},
+		"inventory": {"cards": [{"id": "c_01"}]},
+		"settings": {"bgm_volume": 0.8}
+	}
+	var save_readme_ok = vault.save_slot("profile_readme", readme_payload)
+	assert(save_readme_ok == true, "README canonical schema payload must pass validate_v1_schema")
+	var loaded_readme = vault.load_slot("profile_readme")
+	assert(loaded_readme.get("player").get("name") == "Hero_01", "README schema data must load cleanly")
+
 	# Custom schema validator test
 	vault.schema_validator = func(d: Dictionary) -> Dictionary:
 		if not d.has("mandatory_quest_id"):
