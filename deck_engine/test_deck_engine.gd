@@ -113,5 +113,31 @@ func _init() -> void:
 	assert(univ_slot.can_accept_affinity(test_card.get_affinity()), "Universal slot must accept Fire card")
 	print("CardData affinity and SlotData interoperability verified.")
 
+	# 5. Test GenericCardView.card_data Setter UI Re-rendering
+	var card_view_scene = load("res://deck_engine/GenericCardView.tscn")
+	var test_view = card_view_scene.instantiate()
+	root.add_child(test_view)
+
+	var card_alpha = CardData.create("c_alpha", "Alpha Wolf", 2, "Creature", "Beast", 3, 2, "Prowls in pack")
+	test_view.card_data = card_alpha
+	assert(test_view.name_lbl.text == "Alpha Wolf", "Name label must reflect card_alpha name")
+	assert(test_view.cost_lbl.text == "2", "Cost label must reflect card_alpha cost")
+	assert(test_view.atk_lbl.text == "3", "Atk label must reflect card_alpha atk")
+	assert(test_view.def_lbl.text == "2", "Def label must reflect card_alpha def")
+
+	# Reassign card_data after ready and verify instant re-render
+	var card_omega = CardData.create("c_omega", "Omega Dragon", 7, "Creature", "Fire", 10, 12, "Scorches sky")
+	test_view.card_data = card_omega
+	assert(test_view.name_lbl.text == "Omega Dragon", "Name label must re-render immediately on card_data reassignment")
+	assert(test_view.cost_lbl.text == "7", "Cost label must re-render immediately on card_data reassignment")
+	assert(test_view.atk_lbl.text == "10", "Atk label must re-render immediately on card_data reassignment")
+	assert(test_view.def_lbl.text == "12", "Def label must re-render immediately on card_data reassignment")
+
+	# Null card_data clears labels
+	test_view.card_data = null
+	assert(test_view.name_lbl.text == "", "Name label should be cleared when card_data is set to null")
+	test_view.queue_free()
+	print("GenericCardView card_data setter UI re-rendering verified.")
+
 	print("==> All DeckEngine Unit & Regression Tests PASSED!")
 	quit(0)

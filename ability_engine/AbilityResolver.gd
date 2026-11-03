@@ -4,6 +4,14 @@ extends Node
 ## Universal Data-Driven Ability & Effect Queue Resolver.
 ## Executes effects in a deterministic, FIFO queue with priority support.
 ## Completely decoupled: resolves effects against abstract targets (Nodes, Dictionaries, or Objects).
+##
+## TARGET MUTATION & IMMUTABILITY POLICY:
+## By default, AbilityResolver operates with `mutate_targets_in_place = true`,
+## mutating numerical stat properties ('def', 'hp', 'atk', etc.) directly on Dictionary
+## and Object targets.
+## - Callers who manage immutable state stores should duplicate targets before resolution
+##   (`target.duplicate()`), use `preview_effect_delta()`, or set `mutate_targets_in_place = false`
+##   to compute state changes and inspect `last_applied_deltas` without touching the input dictionary.
 
 const EffectData = preload("EffectData.gd")
 const EffectContext = preload("EffectContext.gd")
@@ -17,6 +25,13 @@ signal queue_empty()
 
 @export var default_step_delay: float = 0.0
 
+## Target Mutation Policy: when true, Dictionary/Object targets have stats modified in place.
+## When false, deltas are computed and emitted via signals without mutating the input target.
+@export var mutate_targets_in_place: bool = true
+
+## Audit log of the most recently computed/applied effect deltas.
+var last_applied_deltas: Array[Dictionary] = []
+
 var _queue: Array[Dictionary] = []
 var _registered_listeners: Array[Dictionary] = [] # Array of {"ability": AbilityDefinition, "entity": Variant, "side": int}
 var is_resolving: bool = false
@@ -26,6 +41,41 @@ var custom_target_resolver: Callable = Callable()
 
 ## Optional custom effect executor callable: func(effect: EffectData, context: EffectContext, target: Variant) -> int
 var custom_effect_handler: Callable = Callable()
+
+
+## Record an applied/computed delta into the audit history
+func _record_delta(target: Variant, op: String, stat: String, old_val: Variant, new_val: Variant, delta: Variant) -> void:
+	last_applied_deltas.append({
+		"target": target,
+		"op": op,
+		"stat": stat,
+		"old_value": old_val,
+		"new_value": new_val,
+		"delta": delta
+	})
+
+
+## Clear the history of recorded deltas
+func clear_deltas() -> void:
+	last_applied_deltas.clear()
+
+
+## Non-mutating preview helper that computes the state delta without touching the input target dictionary.
+func preview_effect_delta(effect: EffectData, target: Dictionary) -> Dictionary:
+	var dup = target.duplicate(true)
+	var prev_mutate = mutate_targets_in_place
+	var prev_deltas = last_applied_deltas.duplicate()
+	last_applied_deltas.clear()
+	mutate_targets_in_place = true
+	var res_val = _execute_effect_on_target(effect, EffectContext.create(), dup)
+	var preview_deltas = last_applied_deltas.duplicate()
+	mutate_targets_in_place = prev_mutate
+	last_applied_deltas = prev_deltas
+	return {
+		"result_value": res_val,
+		"mutated_state": dup,
+		"deltas": preview_deltas
+	}
 
 
 ## Enqueues all effects from an AbilityDefinition
@@ -358,14 +408,16 @@ func _apply_damage(target: Variant, amount: int) -> int:
 	if target is Dictionary:
 		var cur_def = target.get("def", target.get("hp", target.get("current_def", 0)))
 		var new_def = max(0, cur_def - amount)
-		if target.has("def"):
-			target["def"] = new_def
-		elif target.has("hp"):
-			target["hp"] = new_def
-		elif target.has("current_def"):
-			target["current_def"] = new_def
-		if new_def == 0:
-			target["is_destroyed"] = true
+		if mutate_targets_in_place:
+			if target.has("def"):
+				target["def"] = new_def
+			elif target.has("hp"):
+				target["hp"] = new_def
+			elif target.has("current_def"):
+				target["current_def"] = new_def
+			if new_def == 0:
+				target["is_destroyed"] = true
+		_record_delta(target, "damage", "def", cur_def, new_def, -amount)
 		return amount
 
 	# 3. Object properties
@@ -397,12 +449,14 @@ func _apply_heal(target: Variant, amount: int) -> int:
 		var max_def = target.get("max_def", target.get("max_hp", 999999))
 		var new_def = min(max_def, cur_def + amount)
 		var actual_heal = new_def - cur_def
-		if target.has("def"):
-			target["def"] = new_def
-		elif target.has("hp"):
-			target["hp"] = new_def
-		elif target.has("current_def"):
-			target["current_def"] = new_def
+		if mutate_targets_in_place:
+			if target.has("def"):
+				target["def"] = new_def
+			elif target.has("hp"):
+				target["hp"] = new_def
+			elif target.has("current_def"):
+				target["current_def"] = new_def
+		_record_delta(target, "heal", "def", cur_def, new_def, actual_heal)
 		return actual_heal
 
 	if target is Object:
@@ -435,7 +489,10 @@ func _apply_buff(target: Variant, stat_name: String, amount: int) -> int:
 		if target.has(key) or target.has("current_" + key):
 			var actual_key = key if target.has(key) else ("current_" + key)
 			var cur_val = target.get(actual_key, 0)
-			target[actual_key] = cur_val + amount
+			var new_val = cur_val + amount
+			if mutate_targets_in_place:
+				target[actual_key] = new_val
+			_record_delta(target, "buff", actual_key, cur_val, new_val, amount)
 			return amount
 
 	if target is Object:
@@ -459,9 +516,15 @@ func _apply_resource(target: Variant, amount: int) -> int:
 	if target is Dictionary:
 		for prop in ["magic", "mana", "resource", "action_points", "mp"]:
 			if target.has(prop):
-				target[prop] = target.get(prop, 0) + amount
+				var cur = target.get(prop, 0)
+				if mutate_targets_in_place:
+					target[prop] = cur + amount
+				_record_delta(target, "resource", prop, cur, cur + amount, amount)
 				return amount
-		target["magic"] = target.get("magic", 0) + amount
+		var cur_m = target.get("magic", 0)
+		if mutate_targets_in_place:
+			target["magic"] = cur_m + amount
+		_record_delta(target, "resource", "magic", cur_m, cur_m + amount, amount)
 		return amount
 
 	if target is Object:
@@ -490,7 +553,10 @@ func _apply_draw(target: Variant, count: int) -> int:
 			return target.draw(count)
 
 	if target is Dictionary:
-		target["cards_drawn"] = target.get("cards_drawn", 0) + count
+		var cur = target.get("cards_drawn", 0)
+		if mutate_targets_in_place:
+			target["cards_drawn"] = cur + count
+		_record_delta(target, "draw", "cards_drawn", cur, cur + count, count)
 		return count
 
 	push_warning("[AbilityResolver] Cannot apply DRAW_CARD (%d) to target of type %s: target missing draw_cards() or cards_drawn dictionary key." % [count, type_string(typeof(target))])
@@ -510,14 +576,19 @@ func _apply_discard(target: Variant, count: int, _metadata: Dictionary = {}) -> 
 	if target is Dictionary:
 		if target.has("hand") and target["hand"] is Array:
 			var hand_arr: Array = target["hand"]
-			var actual_discarded = 0
-			for _i in range(min(count, hand_arr.size())):
-				hand_arr.pop_back()
-				actual_discarded += 1
-			target["cards_discarded"] = target.get("cards_discarded", 0) + actual_discarded
+			var actual_discarded = min(count, hand_arr.size())
+			var cur_disc = target.get("cards_discarded", 0)
+			if mutate_targets_in_place:
+				for _i in range(actual_discarded):
+					hand_arr.pop_back()
+				target["cards_discarded"] = cur_disc + actual_discarded
+			_record_delta(target, "discard", "cards_discarded", cur_disc, cur_disc + actual_discarded, actual_discarded)
 			return actual_discarded
 		else:
-			target["cards_discarded"] = target.get("cards_discarded", 0) + count
+			var cur_disc = target.get("cards_discarded", 0)
+			if mutate_targets_in_place:
+				target["cards_discarded"] = cur_disc + count
+			_record_delta(target, "discard", "cards_discarded", cur_disc, cur_disc + count, count)
 			return count
 
 	if target is Array:
@@ -540,9 +611,11 @@ func _apply_destroy(target: Variant) -> int:
 		return 1
 
 	if target is Dictionary:
-		target["is_destroyed"] = true
-		target["def"] = 0
-		target["hp"] = 0
+		if mutate_targets_in_place:
+			target["is_destroyed"] = true
+			target["def"] = 0
+			target["hp"] = 0
+		_record_delta(target, "destroy", "is_destroyed", false, true, 1)
 		return 1
 
 	if target is Object:
@@ -567,8 +640,10 @@ func _apply_swap_stats(target: Variant, stat_a: String, stat_b: String) -> int:
 		if target.has(a_key) and target.has(b_key):
 			var val_a = target.get(a_key, 0)
 			var val_b = target.get(b_key, 0)
-			target[a_key] = val_b
-			target[b_key] = val_a
+			if mutate_targets_in_place:
+				target[a_key] = val_b
+				target[b_key] = val_a
+			_record_delta(target, "swap", "%s<->%s" % [a_key, b_key], [val_a, val_b], [val_b, val_a], 0)
 			return 1
 
 	if target is Object and a_key in target and b_key in target:

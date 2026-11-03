@@ -327,6 +327,42 @@ func dispatch_trigger(trigger_name: String, source: Variant = null, context: Var
 	reg_bus.free()
 	print("SystemEventBus real BoardGrid and HandManager auto-bridges verified.")
 
+	# 13. Test Target Mutation Policy & Immutability / Preview Helpers
+	var immut_resolver = AbilityResolver.new()
+	immut_resolver.mutate_targets_in_place = false # Immutable mode
+
+	var immutable_target = {"name": "Shield Guardian", "def": 20, "max_def": 20, "atk": 5}
+	var immut_ctx = EffectContext.create(null, 0, 0, [immutable_target])
+	var test_dmg = EffectData.create_damage(8, EffectData.TargetScope.TARGET_SINGLE)
+
+	immut_resolver.clear_deltas()
+	immut_resolver.enqueue_effect(test_dmg, immut_ctx)
+	immut_resolver.resolve_all_sync()
+
+	# In immutable mode, input target MUST NOT be mutated
+	assert(immutable_target["def"] == 20, "Target def must NOT mutate when mutate_targets_in_place is false")
+	assert(immut_resolver.last_applied_deltas.size() == 1, "last_applied_deltas should contain 1 delta record")
+	var recorded_delta = immut_resolver.last_applied_deltas[0]
+	assert(recorded_delta["op"] == "damage", "Recorded delta op must be 'damage'")
+	assert(recorded_delta["stat"] == "def", "Recorded delta stat must be 'def'")
+	assert(recorded_delta["old_value"] == 20, "Old value must be 20")
+	assert(recorded_delta["new_value"] == 12, "New value must be 12")
+	assert(recorded_delta["delta"] == -8, "Delta amount must be -8")
+
+	# Test preview_effect_delta() helper
+	var preview_source = {"name": "Test Beast", "def": 15, "max_def": 15, "atk": 4}
+	var preview_result = immut_resolver.preview_effect_delta(test_dmg, preview_source)
+
+	# Verify preview does NOT touch preview_source
+	assert(preview_source["def"] == 15, "preview_source def must remain unmodified at 15")
+	assert(preview_result["mutated_state"]["def"] == 7, "preview mutated_state def should be 15 - 8 = 7")
+	assert(preview_result["result_value"] == 8, "preview result_value should be 8")
+	assert(preview_result["deltas"].size() == 1, "preview deltas should have 1 entry")
+	assert(preview_result["deltas"][0]["new_value"] == 7, "preview delta new_value should be 7")
+
+	immut_resolver.free()
+	print("AbilityResolver target mutation policy, immutable mode, and preview_effect_delta verified.")
+
 	print("==================================================")
 	print("ALL ABILITY ENGINE UNIT TESTS PASSED (100%)")
 	print("==================================================")

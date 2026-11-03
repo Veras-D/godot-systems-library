@@ -97,6 +97,19 @@ hand.card_clicked.connect(func(card_view: GenericCardView):
 )
 ```
 
+### 4. Dynamic Card View Updates (`GenericCardView`)
+```gdscript
+var card_view_scene = preload("res://deck_engine/GenericCardView.tscn")
+var card_view = card_view_scene.instantiate() as GenericCardView
+add_child(card_view)
+
+# Assigning card_data immediately renders stats, cost, and name labels:
+card_view.card_data = card_a
+
+# Reassigning card_data at runtime immediately re-renders the UI:
+card_view.card_data = card_b
+```
+
 ---
 
 ## Running the Isolated Testbed

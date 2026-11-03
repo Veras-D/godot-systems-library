@@ -7,7 +7,12 @@ signal card_clicked(card_view: GenericCardView)
 signal card_hovered(card_view: GenericCardView)
 signal card_unhovered(card_view: GenericCardView)
 
-@export var card_data: CardData
+@export var card_data: CardData:
+	set(val):
+		card_data = val
+		_ensure_node_refs()
+		if name_lbl != null:
+			render_card(val)
 
 @onready var panel: Panel = $Panel
 @onready var cost_lbl: Label = $Panel/CostBadge/Label
@@ -17,6 +22,16 @@ signal card_unhovered(card_view: GenericCardView)
 @onready var atk_lbl: Label = $Panel/StatsRow/AtkBadge/Label
 @onready var def_lbl: Label = $Panel/StatsRow/DefBadge/Label
 
+func _ensure_node_refs() -> void:
+	if name_lbl == null and has_node("Panel/NameLabel"):
+		panel = get_node_or_null("Panel")
+		cost_lbl = get_node_or_null("Panel/CostBadge/Label")
+		name_lbl = get_node_or_null("Panel/NameLabel")
+		type_lbl = get_node_or_null("Panel/TypeLabel")
+		desc_lbl = get_node_or_null("Panel/DescLabel")
+		atk_lbl = get_node_or_null("Panel/StatsRow/AtkBadge/Label")
+		def_lbl = get_node_or_null("Panel/StatsRow/DefBadge/Label")
+
 var is_hovered: bool = false
 var is_selected: bool = false
 var home_position: Vector2 = Vector2.ZERO
@@ -24,6 +39,7 @@ var home_rotation: float = 0.0
 var home_z_index: int = 0
 
 func _ready() -> void:
+	_ensure_node_refs()
 	custom_minimum_size = Vector2(130, 180)
 	size = Vector2(130, 180)
 	# Critical for card fanning: pivot must be at bottom-center!
@@ -38,13 +54,25 @@ func _ready() -> void:
 		render_card(card_data)
 
 func render_card(p_data: CardData) -> void:
-	card_data = p_data
-	if not is_inside_tree():
+	if card_data != p_data:
+		card_data = p_data
+		return
+	_ensure_node_refs()
+	if name_lbl == null:
+		return
+
+	if p_data == null:
+		name_lbl.text = ""
+		cost_lbl.text = ""
+		type_lbl.text = ""
+		desc_lbl.text = ""
+		atk_lbl.text = ""
+		def_lbl.text = ""
 		return
 
 	name_lbl.text = p_data.name
 	cost_lbl.text = str(p_data.cost)
-	type_lbl.text = "%s • %s" % [p_data.type.to_upper(), p_data.category]
+	type_lbl.text = "%s • %s" % [p_data.type.to_upper(), p_data.affinity if not p_data.affinity.is_empty() else p_data.category]
 	desc_lbl.text = p_data.description
 	atk_lbl.text = str(p_data.attack)
 	def_lbl.text = str(p_data.defense)

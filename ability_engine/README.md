@@ -119,17 +119,38 @@ event_bus.bind_board_grid(board_grid)
 event_bus.bind_hand_manager(hand_manager, 0) # 0 = player side index
 ```
 
+### 5. Target Mutation & Immutability Policy
+
+By default, `AbilityResolver` mutates dictionary and object targets in place (`mutate_targets_in_place = true`). For consumers managing immutable state trees or who need non-destructive previews:
+
+- **Immutable Execution**: Set `resolver.mutate_targets_in_place = false`. In this mode, input targets are left unmodified, and computed state changes are logged to `resolver.last_applied_deltas`.
+- **Preview Helper**: Call `resolver.preview_effect_delta(effect, target_dict)` to compute the prospective delta and mutated state without changing the original dictionary.
+
+```gdscript
+# Non-destructive effect preview
+var target_state = {"name": "Golem", "def": 12, "max_def": 12}
+var preview = resolver.preview_effect_delta(damage_effect, target_state)
+
+print(preview.result_value)    # e.g. 5
+print(preview.mutated_state)   # {"name": "Golem", "def": 7, "max_def": 12}
+print(target_state.def)        # 12 (original dictionary remains untouched)
+```
+
 ---
 
 ## API Reference
 
 ### `AbilityResolver`
-| Method | Description |
+| Method / Property | Description |
 | :--- | :--- |
+| `mutate_targets_in_place: bool` | When true (default), mutates target dictionaries/objects. When false, computes deltas without writing. |
+| `last_applied_deltas: Array[Dictionary]` | Audit log of recently applied/computed effect deltas. |
 | `enqueue_ability(ability, context, priority = 0)` | Appends all effects in an ability to the queue. |
 | `enqueue_effect(effect, context, priority = 0)` | Appends a single effect into the queue. |
 | `resolve_all_sync()` | Instantly resolves all queued effects without delay. |
 | `process_queue_async(step_delay = -1.0)` | Asynchronously steps through queue with optional delay. |
+| `preview_effect_delta(effect, target_dict) -> Dictionary` | Computes effect deltas on a dictionary clone without mutating the target. |
+| `clear_deltas()` | Clears the audit history of recorded deltas. |
 | `register_trigger_listener(ability, entity, side)` | Registers a reactive trigger listener. |
 | `unregister_entity_listeners(entity)` | Removes all listeners registered to an entity. |
 | `dispatch_trigger(trigger_name, source, context)` | Fires an event trigger and enqueues matching listeners. |
