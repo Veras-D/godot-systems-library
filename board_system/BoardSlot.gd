@@ -170,14 +170,10 @@ func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 			aff = card.get_affinity()
 		elif card is Dictionary and card.has("affinity"):
 			aff = str(card.get("affinity"))
-		elif card is Dictionary and card.has("faction"):
-			aff = str(card.get("faction"))
 		elif card is Object and "affinity" in card:
 			aff = str(card.get("affinity"))
-		elif card is Object and "faction" in card:
-			aff = str(card.get("faction"))
 		else:
-			return false # Malformed card with no affinity/faction
+			return false # Malformed card with no affinity tag
 
 		if grid_owner != null and grid_owner.has_method("validate_placement"):
 			return grid_owner.validate_placement(aff, slot_data.side, slot_data.lane_index, false).get("allowed", false)

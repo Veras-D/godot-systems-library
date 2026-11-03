@@ -5,6 +5,7 @@ const Deck = preload("Deck.gd")
 const HandManager = preload("HandManager.gd")
 const HandManagerScene = preload("HandManager.tscn")
 const GenericCardView = preload("GenericCardView.gd")
+const SlotData = preload("res://board_system/SlotData.gd")
 
 func _init() -> void:
 	print("==> Running DeckEngine Unit & Regression Tests...")
@@ -15,7 +16,7 @@ func _init() -> void:
 	assert(card_a.cost == 3, "Card cost should match")
 	assert(card_a.attack == 6, "Card attack should match")
 	assert(card_a.defense == 8, "Card defense should match")
-	assert(card_a.get_affinity() == "Fire", "CardData get_affinity() should return category/faction")
+	assert(card_a.get_affinity() == "Fire", "CardData get_affinity() should return affinity")
 	print("CardData model verified.")
 
 	# 2. Test Deck Operations
@@ -24,7 +25,7 @@ func _init() -> void:
 
 	var sample_cards: Array[CardData] = []
 	for i in range(12):
-		sample_cards.append(CardData.create("card_%02d" % i, "Test Card %d" % i, i % 4, "Creature", "Neutral", i, i * 2))
+		sample_cards.append(CardData.create("card_%02d" % i, "Test Card %d" % i, i % 4, "Creature", "Universal", i, i * 2))
 
 	deck.add_cards(sample_cards)
 	assert(deck.get_draw_count() == 12, "Draw pile should contain 12 cards")
@@ -40,7 +41,7 @@ func _init() -> void:
 	assert(deck.get_discard_count() == 4, "Discard pile should have 4 cards")
 
 	# Test Draw Pile Exhaustion & Discard Recycling
-	var remaining = deck.draw(8)
+	var _remaining = deck.draw(8)
 	assert(deck.get_draw_count() == 0, "Draw pile should now be empty")
 
 	# Drawing 2 more should automatically recycle the 4 discarded cards
@@ -82,25 +83,35 @@ func _init() -> void:
 	assert(hand.get_card_count() == 4, "Hand should have 4 cards after removal")
 
 	# Clean up
-	hand.free()
+	hand.queue_free()
 
-	# 4. Test CardData Property Unification (N9)
-	var test_card = CardData.create("card_test", "Affinity Test", 1, "Creature", "Beast", 2, 3, "Test", {}, "Corn")
-	assert(test_card.category == "Beast", "Category should be Beast")
-	assert(test_card.affinity == "Corn", "Affinity should be Corn")
-	assert(test_card.faction == "Corn", "Faction alias should match Affinity")
-	assert(test_card.get_affinity() == "Corn", "get_affinity() should return Corn")
+	# 4. Test CardData Affinity & Slot Interoperability (Universal Tag & No Magic Fallback)
+	var test_card = CardData.create("card_test", "Affinity Test", 1, "Creature", "Fire", 2, 3, "Test", {}, "Dragon")
+	assert(test_card.affinity == "Fire", "Affinity should be Fire")
+	assert(test_card.get_affinity() == "Fire", "get_affinity() should return Fire")
+	assert(test_card.category == "Dragon", "Category should be Dragon")
 
-	# Mutating faction must update affinity
-	test_card.faction = "Plains"
-	assert(test_card.affinity == "Plains", "Mutating faction must synchronize affinity")
-	assert(test_card.get_affinity() == "Plains", "get_affinity() must return updated Plains")
+	# Category must NOT leak into affinity or get_affinity()
+	test_card.affinity = ""
+	assert(test_card.get_affinity() == "", "get_affinity() must return affinity directly without falling back to category")
 
-	# Mutating affinity must update faction
-	test_card.affinity = "Swamp"
-	assert(test_card.faction == "Swamp", "Mutating affinity must synchronize faction")
-	assert(test_card.get_affinity() == "Swamp", "get_affinity() must return updated Swamp")
-	print("CardData property unification (N9) verified.")
+	# Test Default Universal Tag on creation
+	var default_card = CardData.create("card_def", "Default Card", 1)
+	assert(default_card.affinity == CardData.UNIVERSAL_TAG, "Default affinity must be UNIVERSAL_TAG (Universal)")
+	assert(default_card.get_affinity() == "Universal", "get_affinity() must return Universal")
+
+	# Test Interoperability with SlotData
+	var forest_slot = SlotData.create(0, 0, "Forest")
+	assert(forest_slot.can_accept_affinity(default_card.get_affinity()), "Universal card must be accepted on Forest slot")
+
+	var fire_slot = SlotData.create(0, 1, "Fire")
+	test_card.affinity = "Fire"
+	assert(fire_slot.can_accept_affinity(test_card.get_affinity()), "Fire card must be accepted on Fire slot")
+	assert(not forest_slot.can_accept_affinity(test_card.get_affinity()), "Fire card must be rejected on Forest slot")
+
+	var univ_slot = SlotData.create(0, 2, "Universal")
+	assert(univ_slot.can_accept_affinity(test_card.get_affinity()), "Universal slot must accept Fire card")
+	print("CardData affinity and SlotData interoperability verified.")
 
 	print("==> All DeckEngine Unit & Regression Tests PASSED!")
 	quit(0)

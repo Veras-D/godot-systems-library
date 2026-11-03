@@ -50,29 +50,43 @@ func _ready() -> void:
     board_grid.lanes_per_side = 4
     board_grid.rebuild_grid()
 
-    # Assign terrain / faction affinities per lane
-    board_grid.set_side_affinities(0, ["Plains", "Corn", "Swamp", "Desert"])
-    board_grid.set_side_affinities(1, ["Corn", "Plains", "Desert", "Swamp"])
+    # Assign terrain affinities per lane
+    board_grid.set_side_affinities(0, ["Forest", "Mountain", "Swamp", "Desert"])
+    board_grid.set_side_affinities(1, ["Mountain", "Forest", "Desert", "Swamp"])
 
     # Connect signals
     board_grid.slot_selected.connect(_on_slot_selected)
     board_grid.occupant_dropped_on_slot.connect(_on_card_dropped)
 ```
 
-### 2. Validating Card Placement
+### 2. Validating Card Placement & Affinity Rules
+
+`board_system` integrates directly with `deck_engine`'s `CardData`:
+
+1. **Deterministic Affinity**:
+   - `CardData.get_affinity()` returns a single string (`affinity`) with zero fallbacks.
+   - `SlotData.can_accept_affinity(occupant_affinity)` evaluates whether the card fits the slot.
+2. **Standard Precedence & Wildcard Rules**:
+   - If the slot is locked or disabled -> **REJECT** (`false`).
+   - If the slot's affinity is blank (`""`) -> **ACCEPT** (`true`).
+   - If the occupant's affinity is blank (`""`) or `"Universal"` (`SlotData.UNIVERSAL_TAG`) -> **ACCEPT** (`true`).
+   - If the slot's affinity is `"Universal"` -> **ACCEPT** (`true`).
+   - Exact string match (`occupant_affinity == slot.affinity`) -> **ACCEPT** (`true`).
+   - Otherwise -> **REJECT** (`false`).
 
 ```gdscript
-func try_play_creature(card_data: Dictionary, side: int, lane: int) -> bool:
-    var validation = board_grid.validate_placement(card_data.affinity, side, lane)
+func try_play_card(card: CardData, side: int, lane: int) -> bool:
+    var validation = board_grid.validate_placement(card.get_affinity(), side, lane)
     if not validation.allowed:
         print("Cannot place card: ", validation.reason)
         return false
 
     var slot = board_grid.get_slot(side, lane)
-    var creature_node = create_creature_view(card_data)
+    var creature_node = create_creature_view(card)
     slot.set_primary_view(creature_node)
     slot.play_summon_pulse()
     return true
+}
 ```
 
 ### 3. Resolving Lane Combat

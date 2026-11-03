@@ -5,6 +5,8 @@ extends Resource
 ## Represents the logical state of a single cell/lane in a lane-based or grid-based game board.
 ## Completely decoupled from any specific game theme or ruleset.
 
+const UNIVERSAL_TAG: String = "Universal"
+
 signal occupant_changed(slot_data: Resource)
 signal affinity_changed(slot_data: Resource, new_affinity: String)
 signal modifiers_changed(slot_data: Resource)
@@ -73,7 +75,7 @@ func has_attachment() -> bool:
 ## and slots with that affinity accept any occupant.
 func can_accept_affinity(
 	occupant_affinity: String,
-	universal_affinity_tag: String = "Universal"
+	universal_affinity_tag: String = UNIVERSAL_TAG
 ) -> bool:
 	if is_locked or is_disabled:
 		return false

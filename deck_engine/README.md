@@ -9,8 +9,9 @@ Designed following the **Systems-First** architecture: zero game-specific coupli
 ## Features
 
 - **Generic Data Model (`CardData.gd`)**:
-  - Encapsulates ID, name, cost, type, category, attack, defense, description, and custom metadata dictionary.
+  - Encapsulates ID, name, cost, type, affinity, attack, defense, description, category (subtype/tribe), and custom metadata dictionary.
   - Zero coupling to any specific IP or mechanics.
+  - Unified **`affinity`** field with `"Universal"` wildcard support for seamless board placement validation.
 - **Universal Deck Manager (`Deck.gd`)**:
   - Draw pile, Discard pile (Graveyard), and Banished pile management.
   - Fisher-Yates shuffle algorithm.
@@ -26,6 +27,26 @@ Designed following the **Systems-First** architecture: zero game-specific coupli
   - Vector/procedural card component with cost bubble, stats badges, and selection glow.
 - **Standalone Interactive Testbed (`testbed_deck.tscn`)**:
   - Interactive table with real-time sliders for arc height, spread angle, and hand width, along with deck statistics and an event log.
+
+---
+
+## Affinity & Board Interoperability Contract
+
+To eliminate hidden mismatch bugs across modules, `deck_engine` and `board_system` share a single, unified affinity vocabulary:
+
+1. **Single Source of Truth (`affinity`)**:
+   - `CardData.affinity: String` stores the terrain or elemental affinity tag (e.g. `"Fire"`, `"Forest"`, `"Universal"`).
+   - Defaults to `CardData.UNIVERSAL_TAG` (`"Universal"`).
+   - The deprecated `faction` getter/setter alias has been removed.
+2. **Direct Getter with Zero Fallback**:
+   - `CardData.get_affinity() -> String` returns `affinity` directly.
+   - It **does not** fall back to tribe/category or aliases. Exactly one deterministic string is returned.
+3. **Decoupled Subtypes (`category`)**:
+   - `CardData.category: String` represents card tribe or archetype (e.g. `"Knight"`, `"Dragon"`, `"Beast"`).
+   - `category` is completely separate from board slot placement rules.
+4. **Universal Wildcard (`"Universal"`)**:
+   - Cards with `affinity = "Universal"` (or `""`) can be placed on any board slot.
+   - Slots with `affinity = "Universal"` (or `""`) accept any card.
 
 ---
 
@@ -56,6 +77,7 @@ add_child(hand)
 
 ### 2. Populate Deck & Draw
 ```gdscript
+# Creates a Fire affinity card:
 var card = CardData.create("c_01", "Flame Dragon", 3, "Creature", "Fire", 6, 8, "Spits fire")
 deck.add_card(card)
 deck.shuffle()
