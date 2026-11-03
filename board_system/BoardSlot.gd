@@ -57,12 +57,23 @@ var custom_affinity_validator: Callable = Callable()
 @onready var attachment_container: Control = $Content/AttachmentContainer
 @onready var modifier_label: Label = $Footer/ModifierLabel
 
+func _ensure_node_refs() -> void:
+	if primary_container == null and has_node("Content/PrimaryContainer"):
+		background_panel = get_node_or_null("Background")
+		highlight_overlay = get_node_or_null("HighlightOverlay")
+		affinity_badge = get_node_or_null("Header/AffinityBadge")
+		lane_coord_label = get_node_or_null("Header/CoordLabel")
+		primary_container = get_node_or_null("Content/PrimaryContainer")
+		attachment_container = get_node_or_null("Content/AttachmentContainer")
+		modifier_label = get_node_or_null("Footer/ModifierLabel")
+
 var current_highlight: HighlightMode = HighlightMode.NONE
 var is_mouse_inside: bool = false
 var _shake_tween: Tween = null
 
 
 func _ready() -> void:
+	_ensure_node_refs()
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
 	gui_input.connect(_on_gui_input)
@@ -80,29 +91,35 @@ func setup(p_slot_data: Resource) -> void:
 
 ## Set or clear occupant visually
 func set_primary_view(view_node: Node) -> void:
-	# Clear existing children
-	for child in primary_container.get_children():
-		child.queue_free()
-	if view_node:
-		primary_container.add_child(view_node)
-		if slot_data:
-			slot_data.primary_occupant = view_node
+	_ensure_node_refs()
+	if primary_container:
+		for child in primary_container.get_children():
+			child.queue_free()
+		if view_node:
+			primary_container.add_child(view_node)
+	if slot_data:
+		slot_data.primary_occupant = view_node
 
 
 func set_attachment_view(view_node: Node) -> void:
-	for child in attachment_container.get_children():
-		child.queue_free()
-	if view_node:
-		attachment_container.add_child(view_node)
-		if slot_data:
-			slot_data.attached_occupant = view_node
+	_ensure_node_refs()
+	if attachment_container:
+		for child in attachment_container.get_children():
+			child.queue_free()
+		if view_node:
+			attachment_container.add_child(view_node)
+	if slot_data:
+		slot_data.attached_occupant = view_node
 
 
 func clear_occupants() -> void:
-	for child in primary_container.get_children():
-		child.queue_free()
-	for child in attachment_container.get_children():
-		child.queue_free()
+	_ensure_node_refs()
+	if primary_container:
+		for child in primary_container.get_children():
+			child.queue_free()
+	if attachment_container:
+		for child in attachment_container.get_children():
+			child.queue_free()
 	if slot_data:
 		slot_data.clear()
 	occupant_cleared.emit(self)

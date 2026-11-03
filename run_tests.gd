@@ -43,7 +43,16 @@ func _init() -> void:
 		var exit_code = OS.execute(godot_bin, ["--headless", "--path", ".", "-s", test_path], output, true)
 		var elapsed = (Time.get_ticks_msec() - t_start) / 1000.0
 
-		var out_str = output[0] if output.size() > 0 else ""
+		var full_output_parts: Array[String] = []
+		for item in output:
+			full_output_parts.append(str(item))
+
+		var out_str: String = ""
+		if not full_output_parts.is_empty():
+			if full_output_parts.size() > 1 and not full_output_parts[0].contains("\n"):
+				out_str = "\n".join(full_output_parts)
+			else:
+				out_str = "".join(full_output_parts)
 
 		if exit_code == 0:
 			passed += 1

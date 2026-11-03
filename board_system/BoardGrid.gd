@@ -15,6 +15,7 @@ signal slot_hover_changed(slot: BoardSlot, is_hovered: bool)
 signal occupant_dropped_on_slot(slot: BoardSlot, data: Variant)
 signal slot_damage_shaken(slot: BoardSlot, intensity: float)
 signal slot_summon_pulsed(slot: BoardSlot)
+signal slot_occupant_cleared(slot: BoardSlot)
 signal grid_rebuilt()
 
 @export var sides_count: int = 2:
@@ -112,6 +113,7 @@ func rebuild_grid() -> void:
 			slot_node.slot_dropped.connect(_on_slot_dropped)
 			slot_node.damage_shake_started.connect(func(s, i): slot_damage_shaken.emit(s, i))
 			slot_node.summon_pulse_started.connect(func(s): slot_summon_pulsed.emit(s))
+			slot_node.occupant_cleared.connect(func(s): slot_occupant_cleared.emit(s))
 
 			var coord = Vector2i(side_idx, lane_idx)
 			_slots_map[coord] = slot_node

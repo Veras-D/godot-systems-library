@@ -262,6 +262,32 @@ func _init() -> void:
 	grid_inst.free()
 	print("Arbitrary sides_count (1, 2, 3, 4, N) and configurable opposing logic verified.")
 
+	# 12. Test BoardSlot.occupant_cleared and BoardGrid.slot_occupant_cleared
+	var clear_test_grid: BoardGrid = BoardGridScene.instantiate()
+	self.root.add_child(clear_test_grid)
+	clear_test_grid.sides_count = 2
+	clear_test_grid.lanes_per_side = 2
+	clear_test_grid.rebuild_grid()
+
+	var slot_cleared_events: Array[BoardSlot] = []
+	clear_test_grid.slot_occupant_cleared.connect(func(s): slot_cleared_events.append(s))
+
+	var target_slot = clear_test_grid.get_slot(0, 0)
+	target_slot.slot_data.primary_occupant = {"name": "TestUnit"}
+
+	# Clear single slot
+	target_slot.clear_occupants()
+	assert(slot_cleared_events.size() == 1 and slot_cleared_events[0] == target_slot, "Clearing slot must fire slot_occupant_cleared on grid")
+	assert(target_slot.slot_data.is_empty(), "Slot data must be empty after clear_occupants")
+
+	# Clear all slots on grid
+	slot_cleared_events.clear()
+	clear_test_grid.clear_all_slots()
+	assert(slot_cleared_events.size() == 4, "clear_all_slots() must emit slot_occupant_cleared for each of the 4 slots")
+
+	clear_test_grid.free()
+	print("BoardSlot.occupant_cleared and BoardGrid.slot_occupant_cleared lifecycle verified.")
+
 	print("==================================================")
 	print("ALL BOARD & LANE SYSTEM UNIT TESTS PASSED (100%)")
 	print("==================================================")

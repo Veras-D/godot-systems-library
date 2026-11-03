@@ -134,6 +134,10 @@ board_grid.slot_damage_shaken.connect(func(slot, intensity):
 board_grid.slot_summon_pulsed.connect(func(slot):
     Audio.play_sfx(summon_sfx)
 )
+# Lifecycle event: react when any slot on the grid is emptied
+board_grid.slot_occupant_cleared.connect(func(slot):
+    print("Slot emptied: Side %d, Lane %d" % [slot.slot_data.side, slot.slot_data.lane_index])
+)
 ```
 
 ### 5. Drag-and-Drop Card Contract
@@ -173,10 +177,12 @@ board_grid.slot_summon_pulsed.connect(func(slot):
 | `clear_all_highlights()` | Resets all slot highlights to normal. |
 | `clear_all_slots()` | Removes all occupants and resets modifiers on all slots. |
 | `serialize_grid() -> Array[Dictionary]` | Exports the entire board state to serializable dictionaries. |
+| `slot_occupant_cleared(slot: BoardSlot)` | Signal emitted when an occupant is cleared from any slot on the grid. |
 
 ### `BoardSlot`
-| Method | Description |
+| Method / Signal | Description |
 | :--- | :--- |
+| `occupant_cleared(slot: BoardSlot)` | Signal emitted when `clear_occupants()` empties the slot. |
 | `update_views()` | Refreshes visual badges, coordinates, and affinity tint from slot data. |
 | `refresh_visuals()` | Public alias for `update_views()`. |
 | `can_accept_drop(data: Variant) -> bool` | Public typed drop validation accepting `CardData` or affinity dictionary. |
