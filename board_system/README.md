@@ -153,6 +153,9 @@ board_grid.slot_summon_pulsed.connect(func(slot):
 ### `BoardSlot`
 | Method | Description |
 | :--- | :--- |
+| `update_views()` | Refreshes visual badges, coordinates, and affinity tint from slot data. |
+| `refresh_visuals()` | Public alias for `update_views()`. |
+| `can_accept_drop(data: Variant) -> bool` | Public typed drop validation accepting `CardData` or affinity dictionary. |
 | `set_primary_view(node: Node)` | Mounts a visual occupant into the primary slot area. |
 | `set_attachment_view(node: Node)` | Mounts a structure or aura view into the attachment area. |
 | `clear_occupants()` | Removes all visual children and clears logical slot data. |

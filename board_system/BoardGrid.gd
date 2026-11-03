@@ -113,7 +113,7 @@ func set_side_affinities(side: int, affinities: Array) -> void:
 		if slot and slot.slot_data:
 			var aff = affinities[lane] if lane < affinities.size() else ""
 			slot.slot_data.affinity = aff
-			slot._update_views()
+			slot.update_views()
 
 
 ## Set affinity for a specific slot
@@ -121,7 +121,7 @@ func set_slot_affinity(side: int, lane: int, affinity: String) -> void:
 	var slot = get_slot(side, lane)
 	if slot and slot.slot_data:
 		slot.slot_data.affinity = affinity
-		slot._update_views()
+		slot.update_views()
 
 
 ## Retrieve a slot by side and lane index

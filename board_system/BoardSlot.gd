@@ -6,6 +6,7 @@ extends Control
 ## Supports drag-and-drop, click-to-place, hover highlights, and feedback animations.
 
 const SlotData = preload("SlotData.gd")
+const CardData = preload("../deck_engine/CardData.gd")
 
 signal slot_clicked(slot: BoardSlot)
 signal slot_hovered(slot: BoardSlot, is_hovered: bool)
@@ -33,7 +34,7 @@ enum HighlightMode {
 			slot_data.occupant_changed.connect(_on_data_occupant_changed)
 			slot_data.affinity_changed.connect(_on_data_affinity_changed)
 			slot_data.modifiers_changed.connect(_on_data_modifiers_changed)
-			_update_views()
+			update_views()
 
 @export var custom_colors: Dictionary = {
 	"Grass": Color(0.2, 0.65, 0.25, 0.4),
@@ -68,7 +69,7 @@ func _ready() -> void:
 
 	if slot_data == null:
 		slot_data = SlotData.create(0, 0, "")
-	_update_views()
+	update_views()
 	set_highlight(HighlightMode.NONE)
 
 
@@ -152,8 +153,10 @@ func play_summon_pulse() -> void:
 	tw.tween_property(self, "scale", Vector2.ONE, 0.25)
 
 
-## Drag and Drop Handlers (Godot Control native D&D)
-func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
+## Validates whether a drop payload can be accepted on this slot.
+## Public, typed entry point for drop checking.
+## Accepts a CardData instance (reads card.get_affinity()) or a Dictionary with an "affinity" key.
+func can_accept_drop(data: Variant) -> bool:
 	if slot_data == null or slot_data.is_locked or slot_data.is_disabled:
 		return false
 	if data == null or not (data is Dictionary):
@@ -166,14 +169,14 @@ func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 			return false # Malformed card payload
 
 		var aff: String = ""
-		if card is Object and card.has_method("get_affinity"):
+		if card is CardData:
 			aff = card.get_affinity()
 		elif card is Dictionary and card.has("affinity"):
-			aff = str(card.get("affinity"))
-		elif card is Object and "affinity" in card:
-			aff = str(card.get("affinity"))
+			aff = str(card.get("affinity", ""))
+		elif card is Object and card.has_method("get_affinity"):
+			aff = card.get_affinity()
 		else:
-			return false # Malformed card with no affinity tag
+			return false # Malformed card with no valid affinity contract
 
 		if grid_owner != null and grid_owner.has_method("validate_placement"):
 			return grid_owner.validate_placement(aff, slot_data.side, slot_data.lane_index, false).get("allowed", false)
@@ -188,6 +191,11 @@ func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 
 	# Disallow any other malformed or unrecognized payload
 	return false
+
+
+## Drag and Drop Handlers (Godot Control native D&D)
+func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
+	return can_accept_drop(data)
 
 
 func _drop_data(_at_position: Vector2, data: Variant) -> void:
@@ -213,7 +221,8 @@ func _on_gui_input(event: InputEvent) -> void:
 		slot_clicked.emit(self)
 
 
-func _update_views() -> void:
+## Public API: Updates visual presentation based on slot_data state
+func update_views() -> void:
 	if not is_inside_tree() or background_panel == null:
 		return
 
@@ -242,13 +251,23 @@ func _update_views() -> void:
 		background_panel.self_modulate = custom_colors["Default"]
 
 
+## Public API alias for update_views()
+func refresh_visuals() -> void:
+	update_views()
+
+
+## Deprecated alias for backward compatibility
+func _update_views() -> void:
+	update_views()
+
+
 func _on_data_occupant_changed(_data: Resource) -> void:
-	_update_views()
+	update_views()
 
 
 func _on_data_affinity_changed(_data: Resource, _new_affinity: String) -> void:
-	_update_views()
+	update_views()
 
 
 func _on_data_modifiers_changed(_data: Resource) -> void:
-	_update_views()
+	update_views()

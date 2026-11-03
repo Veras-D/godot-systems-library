@@ -84,7 +84,7 @@ func _on_btn_cycle_affinity_pressed() -> void:
 	var idx = affinity_cycle.find(cur_aff)
 	var next_aff = affinity_cycle[(idx + 1) % affinity_cycle.size()]
 	selected_slot.slot_data.affinity = next_aff
-	selected_slot._update_views()
+	selected_slot.update_views()
 	_on_slot_selected(selected_slot)
 	_log("Slot [Side %d, Lane %d] affinity set to: '%s'" % [
 		selected_slot.slot_data.side, selected_slot.slot_data.lane_index, next_aff

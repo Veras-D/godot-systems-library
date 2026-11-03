@@ -20,7 +20,10 @@ enum SlotState {
 
 @export var side: int = 0                  # 0 = Side A (e.g. Player), 1 = Side B (e.g. Opponent), or custom ID
 @export var lane_index: int = 0            # 0-indexed column or lane along the board
-@export var affinity: String = ""          # Terrain/elemental affinity tag (e.g. "Grass", "Fire", "Universal", or "")
+@export var affinity: String = "":          # Terrain/elemental affinity tag (e.g. "Grass", "Fire", "Universal", or "")
+	set(val):
+		affinity = val
+		affinity_changed.emit(self, val)
 @export var is_locked: bool = false        # Whether cards can currently be placed
 @export var is_disabled: bool = false      # Whether the slot is inactive in current layout
 @export var modifiers: Dictionary = {}      # Dynamic modifiers (e.g. {"atk_bonus": 2, "def_bonus": 1})
