@@ -13,7 +13,7 @@ func _init() -> void:
 	root.add_child(spinner)
 
 	# 2. Test Setup
-	var cfg = WheelConfig.create_card_wars_attacker(0.80, 0.07)
+	var cfg = WheelConfig.create_tiered(0.70, 0.10)
 	spinner.setup(cfg)
 	assert(spinner.state == WheelSpinner.State.IDLE, "State should be IDLE initially")
 

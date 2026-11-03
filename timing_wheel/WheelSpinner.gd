@@ -24,7 +24,7 @@ func _ready() -> void:
 	custom_minimum_size = Vector2(radius * 2 + 40, radius * 2 + 40)
 	if config == null:
 		# Default fallback config if none provided
-		setup(WheelConfig.create_card_wars_attacker())
+		setup(WheelConfig.create_tiered())
 	gui_input.connect(_on_gui_input)
 
 func setup(p_config: WheelConfig) -> void:

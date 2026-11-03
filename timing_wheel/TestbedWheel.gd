@@ -25,11 +25,11 @@ const WheelSpinner = preload("WheelSpinner.gd")
 var current_cfg: WheelConfig = null
 
 func _ready() -> void:
-	# Configure preset options
-	preset_option.add_item("Card Wars Attacker (80% Hit, 7% Crit, 13% Miss)", 0)
-	preset_option.add_item("Card Wars Defender (15% Block, 5% Crit, 80% Miss)", 1)
-	preset_option.add_item("50/50 Coin Flip (50% Heads, 50% Tails)", 2)
-	preset_option.add_item("RPG 4-Quadrant Lucky Wheel", 3)
+	# Configure neutral preset options
+	preset_option.add_item("3-Tier Outcome (70% Success, 10% Bonus, 20% Failure)", 0)
+	preset_option.add_item("50/50 Binary Coin Flip (Heads / Tails)", 1)
+	preset_option.add_item("4-Quadrant Spinner (Equal 25% Sectors)", 2)
+	preset_option.add_item("8-Sector Precision Dial (12.5% Each)", 3)
 	preset_option.item_selected.connect(_on_preset_selected)
 
 	spin_btn.pressed.connect(_on_spin_pressed)
@@ -49,34 +49,42 @@ func _ready() -> void:
 
 func _apply_preset(idx: int) -> void:
 	match idx:
-		0: # Attacker
-			current_cfg = WheelConfig.create_card_wars_attacker(0.80, 0.07)
-			hit_slider.value = 80
-			crit_slider.value = 7
+		0: # 3-Tier Outcome
+			current_cfg = WheelConfig.create_tiered(0.70, 0.10, 1600.0)
+			hit_slider.value = 70
+			crit_slider.value = 10
 			speed_slider.value = 1600
-		1: # Defender
-			current_cfg = WheelConfig.create_card_wars_defender(0.15, 0.05)
-			hit_slider.value = 15
-			crit_slider.value = 5
-			speed_slider.value = 1750
-		2: # 50/50
-			current_cfg = WheelConfig.create_custom([
-				{ "id": "heads", "name": "HEADS", "ratio": 0.5, "color": Color(0.2, 0.6, 0.9), "multiplier": 1.0 },
-				{ "id": "tails", "name": "TAILS", "ratio": 0.5, "color": Color(0.9, 0.5, 0.2), "multiplier": 1.0 }
-			], 1200.0)
+		1: # 50/50
+			current_cfg = WheelConfig.create_coin_flip(0.50, "HEADS", "TAILS", 1400.0)
 			hit_slider.value = 50
 			crit_slider.value = 0
-			speed_slider.value = 1200
-		3: # 4 Quadrants
-			current_cfg = WheelConfig.create_custom([
-				{ "id": "gold", "name": "1,000 GOLD", "ratio": 0.25, "color": Color(0.95, 0.85, 0.2), "multiplier": 1.0 },
-				{ "id": "gem", "name": "5 GEMS", "ratio": 0.25, "color": Color(0.2, 0.9, 0.5), "multiplier": 1.0 },
-				{ "id": "xp", "name": "500 XP", "ratio": 0.25, "color": Color(0.3, 0.6, 1.0), "multiplier": 1.0 },
-				{ "id": "chest", "name": "RARE CHEST", "ratio": 0.25, "color": Color(0.8, 0.3, 0.8), "multiplier": 1.0 }
-			], 1500.0)
+			speed_slider.value = 1400
+		2: # 4 Quadrants
+			current_cfg = WheelConfig.create_quadrants(["North", "East", "South", "West"], 1500.0)
 			hit_slider.value = 25
 			crit_slider.value = 25
 			speed_slider.value = 1500
+		3: # 8 Sectors
+			var sectors: Array = []
+			var colors = [
+				Color(0.2, 0.65, 0.95), Color(0.95, 0.85, 0.2),
+				Color(0.2, 0.85, 0.45), Color(0.95, 0.5, 0.2),
+				Color(0.85, 0.35, 0.85), Color(0.2, 0.8, 0.8),
+				Color(0.9, 0.3, 0.3), Color(0.65, 0.85, 0.25)
+			]
+			for i in range(8):
+				sectors.append({
+					"id": "sec_%d" % (i + 1),
+					"name": "Sector %d" % (i + 1),
+					"ratio": 0.125,
+					"color": colors[i % colors.size()],
+					"multiplier": 1.0,
+					"is_success": true
+				})
+			current_cfg = WheelConfig.create_custom(sectors, 1800.0)
+			hit_slider.value = 12.5
+			crit_slider.value = 12.5
+			speed_slider.value = 1800
 
 	current_cfg.quick_resolve = quick_resolve_check.button_pressed
 	_update_slider_labels()
@@ -88,27 +96,25 @@ func _on_preset_selected(idx: int) -> void:
 	_apply_preset(idx)
 
 func _on_slider_changed() -> void:
-	var hit_r = hit_slider.value / 100.0
-	var crit_r = crit_slider.value / 100.0
-	if (hit_r + crit_r) > 0.99:
-		crit_r = max(0.01, 0.99 - hit_r)
-		crit_slider.value = crit_r * 100.0
+	var prim_r = hit_slider.value / 100.0
+	var sec_r = crit_slider.value / 100.0
+	if (prim_r + sec_r) > 0.99:
+		sec_r = max(0.01, 0.99 - prim_r)
+		crit_slider.value = sec_r * 100.0
 
-	current_cfg = WheelConfig.create_card_wars_attacker(hit_r, crit_r)
-	current_cfg.spin_speed_deg_sec = speed_slider.value
+	current_cfg = WheelConfig.create_tiered(prim_r, sec_r, speed_slider.value)
 	current_cfg.quick_resolve = quick_resolve_check.button_pressed
-
 	_update_slider_labels()
 	wheel.setup(current_cfg)
 	_update_buttons()
 
 func _update_slider_labels() -> void:
-	var h = hit_slider.value
-	var c = crit_slider.value
-	var m = max(0.0, 100.0 - (h + c))
-	hit_val_label.text = "Hit Area: %.1f%%" % h
-	crit_val_label.text = "Crit Area: %.1f%%" % c
-	miss_val_label.text = "Miss/Defend Area: %.1f%%" % m
+	var prim = hit_slider.value
+	var bonus = crit_slider.value
+	var rem = max(0.0, 100.0 - (prim + bonus))
+	hit_val_label.text = "Primary Sector: %.1f%%" % prim
+	crit_val_label.text = "Bonus Sector: %.1f%%" % bonus
+	miss_val_label.text = "Remaining / Fallback: %.1f%%" % rem
 	speed_val_label.text = "Rotation Speed: %d deg/s" % int(speed_slider.value)
 
 func _on_spin_pressed() -> void:
@@ -123,7 +129,7 @@ func _on_wheel_spin_started() -> void:
 	status_label.text = "🌀 Spinning... Click STOP or tap Space to land!"
 	_update_buttons()
 
-func _on_wheel_sector_crossed(sector: Dictionary) -> void:
+func _on_wheel_sector_crossed(_sector: Dictionary) -> void:
 	# Real-time needle ticking event
 	pass
 
@@ -134,7 +140,7 @@ func _on_wheel_spin_completed(result: Dictionary) -> void:
 	var qr = result.get("quick_resolved", false)
 
 	var color_hex = "green" if mult > 1.0 else ("yellow" if mult > 0.0 else "red")
-	status_label.text = "🎯 RESULT: %s (%.1fx multiplier) at %.1f°" % [name_str, mult, angle]
+	status_label.text = "🎯 RESULT: %s (%.1fx) at %.1f°" % [name_str, mult, angle]
 
 	var entry = "[color=%s]• %s (%.1fx) [Angle: %.1f°]%s[/color]\n" % [
 		color_hex, name_str, mult, angle, " [Instant]" if qr else ""
@@ -161,7 +167,8 @@ func _run_batch_simulation() -> void:
 	var count = 1000
 	var counts: Dictionary = {}
 	for sector in current_cfg.sectors:
-		counts[sector.id] = 0
+		var s_id = sector.get("id", "")
+		counts[s_id] = 0
 
 	for _i in range(count):
 		var res = current_cfg.roll_quick_resolve()
@@ -171,7 +178,7 @@ func _run_batch_simulation() -> void:
 
 	var summary = "Simulated 1,000 Spins:\n"
 	for sector in current_cfg.sectors:
-		var s_id = sector.id
+		var s_id = sector.get("id", "")
 		var actual = counts.get(s_id, 0)
 		var actual_pct = (float(actual) / float(count)) * 100.0
 		var exp_pct = sector.get("ratio", 0.0) * 100.0

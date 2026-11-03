@@ -2,7 +2,7 @@
 
 A completely decoupled, customizable reaction roulette and timing wheel minigame system for Godot 4.
 
-Designed following the **Systems-First** architecture: zero project-specific coupling, fully unit-testable in isolation, and ready to be dropped directly into any other Godot project (RPGs, casino minigames, combat clash wheels, loot spinners).
+Designed following the **Systems-First** architecture: zero project-specific coupling, fully unit-testable in isolation, and ready to be dropped directly into any Godot project (racing games, casino UI, reaction minigames, combat clash meters, loot spinners).
 
 ---
 
@@ -11,7 +11,11 @@ Designed following the **Systems-First** architecture: zero project-specific cou
 - **Custom Vector Graphics**: Procedural pie slice rendering with customizable colors, boundary lines, and animated needle with drop shadow.
 - **Data-Driven Configuration (`WheelConfig.gd`)**:
   - Arbitrary number of sectors with custom IDs, names, ratios, multipliers, and colors.
-  - Built-in factory presets for Card Wars Attacker, Defender, 50/50 Coin Flip, and RPG Loot Wheel.
+  - Neutral built-in factory presets:
+    - `create_tiered()` (3-tier standard / bonus / failure outcome)
+    - `create_coin_flip()` (50/50 binary choice)
+    - `create_quadrants()` (4 equal quadrants)
+    - `create_custom()` (arbitrary sectors and speeds)
   - Rotational speed control (degrees per second, clockwise or counter-clockwise).
 - **Smooth Kinetics & Deceleration**:
   - Minimum spin duration to prevent premature instant taps.
@@ -33,22 +37,55 @@ add_child(wheel)
 ```
 
 ### 2. Configure Sectors & Speed
+
+#### Option A: Using a Neutral Preset
 ```gdscript
-# Card Wars Attacker Reel (80% Hit, 7% Crit, 13% Miss)
-var config = WheelConfig.create_card_wars_attacker(0.80, 0.07)
+# 3-Tier Wheel: 70% Success, 10% Bonus, 20% Failure
+var config = WheelConfig.create_tiered(0.70, 0.10)
 wheel.setup(config)
 
-# Connect signals
 wheel.spin_completed.connect(_on_wheel_result)
 wheel.start_spin()
+```
+
+#### Option B: Building a Custom Wheel
+```gdscript
+var sectors = [
+    {
+        "id": "jackpot",
+        "name": "JACKPOT!",
+        "ratio": 0.05,
+        "color": Color(1.0, 0.85, 0.2),
+        "multiplier": 5.0,
+        "is_success": true
+    },
+    {
+        "id": "regular",
+        "name": "REGULAR PRIZE",
+        "ratio": 0.75,
+        "color": Color(0.2, 0.7, 1.0),
+        "multiplier": 1.0,
+        "is_success": true
+    },
+    {
+        "id": "miss",
+        "name": "TRY AGAIN",
+        "ratio": 0.20,
+        "color": Color(0.85, 0.25, 0.25),
+        "multiplier": 0.0,
+        "is_success": false
+    }
+]
+var config = WheelConfig.create_custom(sectors, 1600.0)
+wheel.setup(config)
 ```
 
 ### 3. Handle the Result
 ```gdscript
 func _on_wheel_result(result: Dictionary) -> void:
-    print("Landed on: ", result.name)        # "CRITICAL HIT!"
-    print("Damage Multiplier: ", result.multiplier) # 2.0
-    print("Final Angle: ", result.angle_deg) # 45.2°
+    print("Landed on: ", result.name)              # "JACKPOT!"
+    print("Multiplier: ", result.multiplier)       # 5.0
+    print("Final Angle: ", result.angle_deg)       # 45.2°
 ```
 
 ### 4. Typed Result Contract (`WheelResult`)
@@ -57,11 +94,13 @@ In addition to dictionary access, outcomes can be consumed via the typed `WheelC
 
 ```gdscript
 var outcome: WheelConfig.WheelResult = wheel.get_last_result()
-if outcome.id == WheelConfig.ID_CRIT:
-    print("Critical multiplier: ", outcome.multiplier) # 2.0
+if outcome.id == WheelConfig.ID_PARTIAL:
+    print("Bonus multiplier: ", outcome.multiplier)
+elif outcome.id == WheelConfig.ID_SUCCESS:
+    print("Standard success: ", outcome.multiplier)
 ```
 
-Sector ID constants available: `WheelConfig.ID_HIT`, `WheelConfig.ID_CRIT`, `WheelConfig.ID_MISS`.
+Generic outcome constants available: `WheelConfig.ID_SUCCESS`, `WheelConfig.ID_PARTIAL`, `WheelConfig.ID_FAILURE`.
 
 ---
 
