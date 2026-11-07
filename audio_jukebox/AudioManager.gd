@@ -27,6 +27,8 @@ var _sfx_available: Array[AudioStreamPlayer] = []
 
 var _bus_music_name: String = "Master"
 var _bus_sfx_name: String = "Master"
+var _bus_voice_name: String = "Master"
+var _voice_player: AudioStreamPlayer = null
 
 func _init() -> void:
 	_setup_buses()
@@ -36,6 +38,8 @@ func _ready() -> void:
 		_setup_bgm_players()
 	if _sfx_pool.is_empty():
 		_setup_sfx_pool()
+	if _voice_player == null:
+		_setup_voice_player()
 
 func _setup_buses() -> void:
 	# Check if dedicated buses exist; if not, create them or fall back to Master
@@ -60,6 +64,25 @@ func _setup_buses() -> void:
 		AudioServer.set_bus_name(bus_idx, "SFX")
 		AudioServer.set_bus_send(bus_idx, "Master")
 		_bus_sfx_name = "SFX"
+
+	if AudioServer.get_bus_index("Voice") != -1:
+		_bus_voice_name = "Voice"
+	elif AudioServer.get_bus_index("VO") != -1:
+		_bus_voice_name = "VO"
+	else:
+		# Auto-create Voice bus routed to Master
+		var bus_idx = AudioServer.bus_count
+		AudioServer.add_bus(bus_idx)
+		AudioServer.set_bus_name(bus_idx, "Voice")
+		AudioServer.set_bus_send(bus_idx, "Master")
+		_bus_voice_name = "Voice"
+
+func _setup_voice_player() -> void:
+	if _voice_player == null:
+		_voice_player = AudioStreamPlayer.new()
+		_voice_player.name = "Voice_Player"
+		_voice_player.bus = _bus_voice_name
+		add_child(_voice_player)
 
 func _setup_bgm_players() -> void:
 	_bgm_a = AudioStreamPlayer.new()
@@ -204,6 +227,31 @@ func get_total_sfx_pool_size() -> int:
 	return _sfx_pool.size()
 
 # ==============================================================================
+# Voice Playback (Dedicated Voice Bus)
+# ==============================================================================
+
+func play_voice(stream: AudioStream, volume_db: float = 0.0, pitch_scale: float = 1.0) -> AudioStreamPlayer:
+	if stream == null:
+		return null
+	if _voice_player == null:
+		_setup_voice_player()
+
+	_voice_player.stop()
+	_voice_player.stream = stream
+	_voice_player.volume_db = volume_db
+	_voice_player.pitch_scale = pitch_scale
+	_voice_player.play()
+	return _voice_player
+
+func stop_voice() -> void:
+	if _voice_player and _voice_player.playing:
+		_voice_player.stop()
+		_voice_player.stream = null
+
+func is_voice_playing() -> bool:
+	return _voice_player != null and _voice_player.playing
+
+# ==============================================================================
 # Volume & Bus Controls (0.0 to 1.0 linear, converted to dB)
 # ==============================================================================
 
@@ -236,11 +284,26 @@ func is_bus_muted(bus_name: String) -> bool:
 func set_master_volume(linear: float) -> void:
 	set_bus_volume_linear("Master", linear)
 
+func get_master_volume() -> float:
+	return get_bus_volume_linear("Master")
+
 func set_music_volume(linear: float) -> void:
 	set_bus_volume_linear(_bus_music_name, linear)
 
+func get_music_volume() -> float:
+	return get_bus_volume_linear(_bus_music_name)
+
 func set_sfx_volume(linear: float) -> void:
 	set_bus_volume_linear(_bus_sfx_name, linear)
+
+func get_sfx_volume() -> float:
+	return get_bus_volume_linear(_bus_sfx_name)
+
+func set_voice_volume(linear: float) -> void:
+	set_bus_volume_linear(_bus_voice_name, linear)
+
+func get_voice_volume() -> float:
+	return get_bus_volume_linear(_bus_voice_name)
 
 # ==============================================================================
 # Procedural Audio Synthesizer (Zero-dependency test tones & beeps)
