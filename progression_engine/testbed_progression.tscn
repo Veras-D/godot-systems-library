@@ -1,0 +1,266 @@
+[gd_scene load_steps=3 format=3 uid="uid://tbpe001"]
+
+[ext_resource type="Script" path="TestbedProgression.gd" id="1_script"]
+[ext_resource type="Theme" path="res://testbed_theme.tres" id="2_theme"]
+
+[node name="TestbedProgression" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.09, 0.13, 1)
+
+[node name="Layout" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="Header" type="VBoxContainer" parent="Layout"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Layout/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.85, 0.35, 1)
+theme_override_font_sizes/font_size = 22
+text = "Universal Progression & Economy Engine"
+
+[node name="Subtitle" type="Label" parent="Layout/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.7, 0.85, 1)
+theme_override_font_sizes/font_size = 13
+text = "Godot Modular Systems Library — Standalone Module: progression_engine/"
+
+[node name="MainArea" type="VBoxContainer" parent="Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Content" type="HBoxContainer" parent="Layout/MainArea"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="Left" type="VBoxContainer" parent="Layout/MainArea/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="WalletPanel" type="PanelContainer" parent="Layout/MainArea/Content/Left"]
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="Layout/MainArea/Content/Left/WalletPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="Layout/MainArea/Content/Left/WalletPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="WalletTitle" type="Label" parent="Layout/MainArea/Content/Left/WalletPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
+text = "💳 Multi-Currency Wallet"
+
+[node name="GoldRow" type="HBoxContainer" parent="Layout/MainArea/Content/Left/WalletPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Layout/MainArea/Content/Left/WalletPanel/Margin/VBox/GoldRow"]
+layout_mode = 2
+text = "Gold Balance: "
+
+[node name="Value" type="Label" parent="Layout/MainArea/Content/Left/WalletPanel/Margin/VBox/GoldRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+text = "500 G"
+
+[node name="AddGold100" type="Button" parent="Layout/MainArea/Content/Left/WalletPanel/Margin/VBox/GoldRow"]
+layout_mode = 2
+text = "+100 G"
+
+[node name="GemsRow" type="HBoxContainer" parent="Layout/MainArea/Content/Left/WalletPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Layout/MainArea/Content/Left/WalletPanel/Margin/VBox/GemsRow"]
+layout_mode = 2
+text = "Algebraic Gems: "
+
+[node name="Value" type="Label" parent="Layout/MainArea/Content/Left/WalletPanel/Margin/VBox/GemsRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.3, 0.9, 0.8, 1)
+text = "15 💎"
+
+[node name="AddGems5" type="Button" parent="Layout/MainArea/Content/Left/WalletPanel/Margin/VBox/GemsRow"]
+layout_mode = 2
+text = "+5 💎"
+
+[node name="EnergyRow" type="HBoxContainer" parent="Layout/MainArea/Content/Left/WalletPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Layout/MainArea/Content/Left/WalletPanel/Margin/VBox/EnergyRow"]
+layout_mode = 2
+text = "Stamina/Energy: "
+
+[node name="Value" type="Label" parent="Layout/MainArea/Content/Left/WalletPanel/Margin/VBox/EnergyRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.5, 1, 1)
+text = "50 / 100 ⚡"
+
+[node name="ProgressionPanel" type="PanelContainer" parent="Layout/MainArea/Content/Left"]
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="Layout/MainArea/Content/Left/ProgressionPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="Layout/MainArea/Content/Left/ProgressionPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="LevelHeader" type="HBoxContainer" parent="Layout/MainArea/Content/Left/ProgressionPanel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Layout/MainArea/Content/Left/ProgressionPanel/Margin/VBox/LevelHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
+text = "⭐ Hero Level Progression"
+
+[node name="LevelValue" type="Label" parent="Layout/MainArea/Content/Left/ProgressionPanel/Margin/VBox/LevelHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+text = "Level 1 / 50"
+
+[node name="XPBar" type="ProgressBar" parent="Layout/MainArea/Content/Left/ProgressionPanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+show_percentage = false
+
+[node name="XPText" type="Label" parent="Layout/MainArea/Content/Left/ProgressionPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "XP: 0 / 100 (0%)"
+
+[node name="LevelStatus" type="Label" parent="Layout/MainArea/Content/Left/ProgressionPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+text = "Ready to train."
+
+[node name="XPButtons" type="HBoxContainer" parent="Layout/MainArea/Content/Left/ProgressionPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Add50XP" type="Button" parent="Layout/MainArea/Content/Left/ProgressionPanel/Margin/VBox/XPButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "+50 XP"
+
+[node name="Add250XP" type="Button" parent="Layout/MainArea/Content/Left/ProgressionPanel/Margin/VBox/XPButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "+250 XP"
+
+[node name="Add1000XP" type="Button" parent="Layout/MainArea/Content/Left/ProgressionPanel/Margin/VBox/XPButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "+1,000 XP"
+
+[node name="Right" type="VBoxContainer" parent="Layout/MainArea/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="GachaPanel" type="PanelContainer" parent="Layout/MainArea/Content/Right"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Margin" type="MarginContainer" parent="Layout/MainArea/Content/Right/GachaPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="Layout/MainArea/Content/Right/GachaPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="GachaTitle" type="Label" parent="Layout/MainArea/Content/Right/GachaPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.85, 1, 1)
+text = "🎁 Gacha Loot Chest Roller"
+
+[node name="PoolPicker" type="OptionButton" parent="Layout/MainArea/Content/Right/GachaPanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+
+[node name="PityLabel" type="Label" parent="Layout/MainArea/Content/Right/GachaPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
+theme_override_font_sizes/font_size = 12
+text = "Pity Progress: 0 / 10"
+
+[node name="RollButtons" type="HBoxContainer" parent="Layout/MainArea/Content/Right/GachaPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Roll1x" type="Button" parent="Layout/MainArea/Content/Right/GachaPanel/Margin/VBox/RollButtons"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "🎲 Roll 1x"
+
+[node name="Roll10x" type="Button" parent="Layout/MainArea/Content/Right/GachaPanel/Margin/VBox/RollButtons"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "⚡ Roll 10x"
+
+[node name="GachaStatus" type="Label" parent="Layout/MainArea/Content/Right/GachaPanel/Margin/VBox"]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="ResultsTitle" type="Label" parent="Layout/MainArea/Content/Right/GachaPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Recent Pulls:"
+
+[node name="ResultsList" type="ItemList" parent="Layout/MainArea/Content/Right/GachaPanel/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[connection signal="pressed" from="Layout/MainArea/Content/Left/WalletPanel/Margin/VBox/GoldRow/AddGold100" to="." method="_on_deposit_gold" binds= [100]]
+[connection signal="pressed" from="Layout/MainArea/Content/Left/WalletPanel/Margin/VBox/GemsRow/AddGems5" to="." method="_on_deposit_gems" binds= [5]]
+[connection signal="pressed" from="Layout/MainArea/Content/Left/ProgressionPanel/Margin/VBox/XPButtons/Add50XP" to="." method="_on_add_xp" binds= [50]]
+[connection signal="pressed" from="Layout/MainArea/Content/Left/ProgressionPanel/Margin/VBox/XPButtons/Add250XP" to="." method="_on_add_xp" binds= [250]]
+[connection signal="pressed" from="Layout/MainArea/Content/Left/ProgressionPanel/Margin/VBox/XPButtons/Add1000XP" to="." method="_on_add_xp" binds= [1000]]
+[connection signal="pressed" from="Layout/MainArea/Content/Right/GachaPanel/Margin/VBox/RollButtons/Roll1x" to="." method="_on_roll_gacha" binds= [1]]
+[connection signal="pressed" from="Layout/MainArea/Content/Right/GachaPanel/Margin/VBox/RollButtons/Roll10x" to="." method="_on_roll_gacha" binds= [10]]
