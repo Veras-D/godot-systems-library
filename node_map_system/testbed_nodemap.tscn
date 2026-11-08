@@ -1,0 +1,193 @@
+[gd_scene format=3 uid="uid://b7qm1vbp3nm41"]
+
+[ext_resource type="Script" path="res://node_map_system/TestbedNodeMap.gd" id="1_testbed_script"]
+[ext_resource type="Script" path="res://node_map_system/NodeMapRenderer.gd" id="2_renderer_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
+bg_color = Color(0.08, 0.1, 0.15, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_map_bg"]
+bg_color = Color(0.05, 0.07, 0.1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.28, 0.4, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sidebar_panel"]
+bg_color = Color(0.1, 0.13, 0.2, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3, 0.4, 0.6, 0.8)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="TestbedNodeMap" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_testbed_script")
+
+[node name="Background" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bg")
+
+[node name="HBox" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="MapArea" type="PanelContainer" parent="HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_map_bg")
+
+[node name="MapRenderer" type="Control" parent="HBox/MapArea"]
+layout_mode = 2
+script = ExtResource("2_renderer_script")
+
+[node name="Sidebar" type="VBoxContainer" parent="HBox"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="DetailsPanel" type="PanelContainer" parent="HBox/Sidebar"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_sidebar_panel")
+
+[node name="VBox" type="VBoxContainer" parent="HBox/Sidebar/DetailsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Header" type="Label" parent="HBox/Sidebar/DetailsPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.8, 0.3, 1)
+theme_override_font_sizes/font_size = 15
+text = "NODE INSPECTOR"
+
+[node name="NodeTitle" type="Label" parent="HBox/Sidebar/DetailsPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Select a node..."
+
+[node name="NodeState" type="Label" parent="HBox/Sidebar/DetailsPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "State: -"
+
+[node name="NodeStars" type="Label" parent="HBox/Sidebar/DetailsPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 13
+text = "Stars: 0 / 3"
+
+[node name="NodePrereqs" type="Label" parent="HBox/Sidebar/DetailsPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+theme_override_font_sizes/font_size = 12
+text = "Prerequisites: -"
+autowrap_mode = 2
+
+[node name="Actions" type="HBoxContainer" parent="HBox/Sidebar/DetailsPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Complete1Btn" type="Button" parent="HBox/Sidebar/DetailsPanel/VBox/Actions"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "★ Clear"
+
+[node name="Complete2Btn" type="Button" parent="HBox/Sidebar/DetailsPanel/VBox/Actions"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "★★ Clear"
+
+[node name="Complete3Btn" type="Button" parent="HBox/Sidebar/DetailsPanel/VBox/Actions"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "★★★ Clear"
+
+[node name="StatsPanel" type="PanelContainer" parent="HBox/Sidebar"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_sidebar_panel")
+
+[node name="VBox" type="VBoxContainer" parent="HBox/Sidebar/StatsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Header" type="Label" parent="HBox/Sidebar/StatsPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 15
+text = "CAMPAIGN PROGRESS"
+
+[node name="TotalStarsLabel" type="Label" parent="HBox/Sidebar/StatsPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "Total Stars: 0"
+
+[node name="CompletionLabel" type="Label" parent="HBox/Sidebar/StatsPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "Progress: 0.0%"
+
+[node name="ActionsPanel" type="PanelContainer" parent="HBox/Sidebar"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_sidebar_panel")
+
+[node name="VBox" type="VBoxContainer" parent="HBox/Sidebar/ActionsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Header" type="Label" parent="HBox/Sidebar/ActionsPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.9, 0.4, 1)
+theme_override_font_sizes/font_size = 15
+text = "CONTROLS & TESTS"
+
+[node name="ResetBtn" type="Button" parent="HBox/Sidebar/ActionsPanel/VBox"]
+layout_mode = 2
+text = "🔄 Reset Campaign"
+
+[node name="SaveBtn" type="Button" parent="HBox/Sidebar/ActionsPanel/VBox"]
+layout_mode = 2
+text = "💾 Save Progress State"
+
+[node name="LoadBtn" type="Button" parent="HBox/Sidebar/ActionsPanel/VBox"]
+layout_mode = 2
+text = "📂 Load Progress State"
+
+[node name="EvalTestBtn" type="Button" parent="HBox/Sidebar/ActionsPanel/VBox"]
+layout_mode = 2
+text = "🎯 Test Star Evaluator"
+
+[node name="EvalResultLabel" type="Label" parent="HBox/Sidebar/ActionsPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.9, 0.5, 1)
+theme_override_font_sizes/font_size = 12
+text = ""
+autowrap_mode = 2

@@ -19,7 +19,7 @@ A collection of polished, reusable, completely decoupled game systems and isolat
 | **Save Vault** | [`save_vault/`](./save_vault/) | Secure JSON save state manager, atomic writes, slot backups, and schema migration. | ✅ **Production Ready** |
 | **Crafting & Fusion** | [`crafting_fusion/`](./crafting_fusion/) | Universal recipe matching engine, multi-tier quality scaling, and ingredient ledger. | ✅ **Production Ready** |
 | **Progression Engine** | [`progression_engine/`](./progression_engine/) | Multi-currency transaction wallet, XP level curves, and weighted drop-table gacha roller. | ✅ **Production Ready** |
-| **Campaign Node Map** | [`node_map_system/`](./node_map_system/) | Directed acyclic graph (DAG) progression, procedural connection lines, and 3-star objective engine. | 📋 **Planned** |
+| **Campaign Node Map** | [`node_map_system/`](./node_map_system/) | Directed acyclic graph (DAG) progression, procedural connection lines, and 3-star objective engine. | ✅ **Production Ready** |
 | **Local Multiplayer** | [`local_multiplayer/`](./local_multiplayer/) | Hotseat Pass & Play privacy curtain state machine and dual-gamepad hardware input router. | 📋 **Planned** |
 | **Settings Vault** | [`settings_vault/`](./settings_vault/) | Audio bus sync, display modes (fullscreen/windowed), VSync, and preference serialization. | 📋 **Planned** |
 | **Gamepad Navigator** | [`gamepad_navigator/`](./gamepad_navigator/) | Universal UI focus graph, virtual D-pad cursor snapping, and dynamic controller prompt glyphs. | 📋 **Planned (Later)** |
@@ -48,6 +48,13 @@ This library registers clean, idiomatic GDScript classes (`class_name`) to serve
 | | `AbilityResolver` | `Node` | Priority FIFO action queue and reaction engine |
 | | `SystemEventBus` | `Node` | Decoupled game event broadcaster with auto-resolver bridge |
 | **`save_vault`** | `SaveVault` | `Node` | Atomic JSON serializer with SHA-256 and `.bak` recovery |
+| **`crafting_fusion`** | `CraftingEngine` | `RefCounted` | Recipe material validator, deduction engine, and tier scaler |
+| **`progression_engine`** | `CurrencyWallet` | `RefCounted` | Multi-currency atomic ledger with overflow caps & transfers |
+| | `ProgressionTracker` | `RefCounted` | Universal XP curve manager with level thresholds & stat points |
+| | `GachaRoller` | `RefCounted` | Weighted drop-table roller with pity threshold guarantees |
+| **`node_map_system`** | `NodeMapGraph` | `RefCounted` | Universal DAG progression graph with prerequisites and star ratings |
+| | `StarConditionEvaluator` | `RefCounted` | Post-match objective evaluation engine (turns, HP, casualties, restrictions) |
+| | `NodeMapRenderer` | `Control` | Visual road spline and interactive pin renderer with canvas pan/zoom |
 
 ---
 
