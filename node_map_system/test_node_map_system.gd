@@ -159,6 +159,14 @@ func _init() -> void:
 	var stars_earned = StarConditionEvaluator.count_stars_earned(three_conditions, won_stats)
 	assert(stars_earned == 3, "All 3 conditions should be met (earned 3 stars)")
 
+	# Audit report testing
+	var audit_report = StarConditionEvaluator.audit_star_conditions(three_conditions, won_stats)
+	assert(audit_report.size() == 3, "Audit report has 3 items")
+	assert(audit_report[0]["passed"] == true, "Condition 1 passed")
+	assert(audit_report[1]["passed"] == true, "Condition 2 passed")
+	assert(audit_report[1]["detail"] == "4 / 5 turns", "Condition 2 detail matches telemetry")
+	assert(audit_report[2]["passed"] == true, "Condition 3 passed")
+
 	# ==========================================================================
 	# 5. Serialization & Deserialization
 	# ==========================================================================

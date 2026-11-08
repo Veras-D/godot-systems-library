@@ -180,6 +180,89 @@ static func count_stars_earned(conditions: Array, stats: Dictionary) -> int:
 	return clampi(stars, 0, 3)
 
 
+## Audits an array of conditions against match stats and returns a detailed report for each condition.
+## Useful for post-match scoreboards and condition verification screens.
+static func audit_star_conditions(conditions: Array, stats: Dictionary) -> Array[Dictionary]:
+	var report: Array[Dictionary] = []
+	for i in range(conditions.size()):
+		var cond = conditions[i]
+		if typeof(cond) != TYPE_DICTIONARY:
+			continue
+		var passed = evaluate_condition(cond, stats)
+		var cond_id = str(cond.get("id", cond.get("ID", cond.get("type", "")))).strip_edges()
+		var desc = str(cond.get("description", cond.get("Description", cond_id)))
+		var detail = _generate_condition_detail(cond, stats, passed)
+		report.append({
+			"index": i,
+			"condition_id": cond_id,
+			"passed": passed,
+			"description": desc,
+			"detail": detail
+		})
+	return report
+
+
+static func _generate_condition_detail(condition: Dictionary, stats: Dictionary, passed: bool) -> String:
+	if not bool(stats.get("won", false)):
+		return "Defeat"
+
+	var cond_id = str(condition.get("id", condition.get("ID", condition.get("type", "")))).strip_edges()
+	if cond_id == "JustWin":
+		return "Match Won"
+
+	# Turn check
+	var raw_turns = str(condition.get("max_turns", condition.get("MaxTurns", ""))).strip_edges()
+	var max_turns = int(raw_turns) if raw_turns.is_valid_int() else 0
+	if max_turns <= 0 and cond_id.begins_with("FastWin"):
+		var suffix = cond_id.replace("FastWin", "")
+		if suffix.is_valid_int():
+			max_turns = int(suffix)
+	if max_turns > 0:
+		var turns_taken = int(stats.get("turns", 0))
+		return "%d / %d turns" % [turns_taken, max_turns]
+
+	# HP Lost
+	var raw_hp = str(condition.get("max_hp_lost", condition.get("MaxHPLost", ""))).strip_edges()
+	var max_hp = int(raw_hp) if raw_hp.is_valid_int() else -1
+	if max_hp < 0 and cond_id.begins_with("Only") and cond_id.ends_with("HP"):
+		var num_str = cond_id.replace("Only", "").replace("HP", "")
+		if num_str.is_valid_int():
+			max_hp = int(num_str)
+	if max_hp >= 0:
+		var hp_lost = int(stats.get("player_hp_lost", 0))
+		return "%d / %d HP lost" % [hp_lost, max_hp]
+
+	# Friendly Creatures Lost
+	var raw_c = str(condition.get("max_creatures_lost", condition.get("MaxNumCreaturesLost", ""))).strip_edges()
+	var max_creatures_lost = int(raw_c) if raw_c.is_valid_int() else -1
+	if max_creatures_lost < 0 and cond_id.begins_with("OnlyLose") and cond_id.ends_with("Creatures"):
+		var num_str = cond_id.replace("OnlyLose", "").replace("Creatures", "")
+		if num_str.is_valid_int():
+			max_creatures_lost = int(num_str)
+	if max_creatures_lost >= 0:
+		var creatures_lost = int(stats.get("player_creatures_lost", 0))
+		return "%d / %d creatures lost" % [creatures_lost, max_creatures_lost]
+
+	# Enemy Creatures Defeated
+	var raw_def = str(condition.get("min_creatures_defeated", condition.get("MinCreaturesDefeated", ""))).strip_edges()
+	var min_def = int(raw_def) if raw_def.is_valid_int() else 0
+	if min_def <= 0 and (cond_id.begins_with("Defeat") or cond_id.begins_with("Deafeat")):
+		var num_str = cond_id.replace("Defeat", "").replace("Deafeat", "")
+		if num_str.is_valid_int():
+			min_def = int(num_str)
+	if min_def > 0:
+		var defeated = int(stats.get("enemy_creatures_defeated", 0))
+		return "%d / %d defeated" % [defeated, min_def]
+
+	# Card types
+	if cond_id == "Forbid_Spells":
+		return "Passed (No Spells)" if passed else "Failed (Spell Played)"
+	if cond_id == "Only_Creatures":
+		return "Passed (Only Creatures)" if passed else "Failed (Non-Creature Played)"
+
+	return "Passed" if passed else "Failed"
+
+
 # Helper: Parses string ("Plains, Corn") or Array into a clean lowercased Array[String]
 static func _parse_string_or_array(raw) -> Array[String]:
 	var res: Array[String] = []
