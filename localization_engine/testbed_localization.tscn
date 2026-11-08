@@ -1,0 +1,119 @@
+[gd_scene load_steps=3 format=3 uid="uid://testbed_localization_001"]
+
+[ext_resource type="Script" path="res://localization_engine/TestbedLocalization.gd" id="1_testbed"]
+[ext_resource type="Script" path="res://localization_engine/LocalizationManager.gd" id="2_manager"]
+
+[node name="TestbedLocalization" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_testbed")
+
+[node name="LocalizationManager" type="Node" parent="."]
+script = ExtResource("2_manager")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = 24.0
+offset_right = -40.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="Header" type="VBoxContainer" parent="VBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="VBox/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "🌍 SYS-13: Universal Localization Engine Testbed"
+horizontal_alignment = 1
+
+[node name="LangSelectionBar" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LangLabel" type="Label" parent="VBox/LangSelectionBar"]
+layout_mode = 2
+text = "Select Active Locale:"
+
+[node name="LangOption" type="OptionButton" parent="VBox/LangSelectionBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 0)
+layout_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="VBox"]
+layout_mode = 2
+
+[node name="DemoContainer" type="PanelContainer" parent="VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="DemoVBox" type="VBoxContainer" parent="VBox/DemoContainer"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="DemoTitle" type="Label" parent="VBox/DemoContainer/DemoVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Card Wars: Kingdom"
+horizontal_alignment = 1
+
+[node name="BtnBox" type="VBoxContainer" parent="VBox/DemoContainer/DemoVBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 10
+
+[node name="DemoPlay" type="Button" parent="VBox/DemoContainer/DemoVBox/BtnBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 40)
+layout_mode = 2
+text = "⚔️ Play Match"
+
+[node name="DemoSettings" type="Button" parent="VBox/DemoContainer/DemoVBox/BtnBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 40)
+layout_mode = 2
+text = "⚙️ Settings"
+
+[node name="DemoQuit" type="Button" parent="VBox/DemoContainer/DemoVBox/BtnBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 40)
+layout_mode = 2
+text = "🚪 Quit Game"
+
+[node name="LookupBox" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="KeyLabel" type="Label" parent="VBox/LookupBox"]
+layout_mode = 2
+text = "Test Key Lookup:"
+
+[node name="TestKeyEdit" type="LineEdit" parent="VBox/LookupBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "DEMO_TITLE"
+
+[node name="TranslateBtn" type="Button" parent="VBox/LookupBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Translate Key"
+
+[node name="ResultLabel" type="Label" parent="VBox/LookupBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.9, 0.6, 1)
+text = "Result: -"
