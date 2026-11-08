@@ -17,6 +17,12 @@ A collection of polished, reusable, completely decoupled game systems and isolat
 | **Board System** | [`board_system/`](./board_system/) | Universal lane & grid board slotting, drop target arbitration, and placement affinity. | ✅ **Production Ready** |
 | **Ability Engine** | [`ability_engine/`](./ability_engine/) | Universal trigger/action effect resolver, queue processor, and event bus. | ✅ **Production Ready** |
 | **Save Vault** | [`save_vault/`](./save_vault/) | Secure JSON save state manager, atomic writes, slot backups, and schema migration. | ✅ **Production Ready** |
+| **Crafting & Fusion** | [`crafting_fusion/`](./crafting_fusion/) | Universal recipe matching engine, multi-tier quality scaling, and ingredient ledger. | 🛠️ **In Progress** |
+| **Progression Engine** | [`progression_engine/`](./progression_engine/) | Multi-currency transaction wallet, XP level curves, and weighted drop-table gacha roller. | 📋 **Planned** |
+| **Campaign Node Map** | [`node_map_system/`](./node_map_system/) | Directed acyclic graph (DAG) progression, procedural connection lines, and 3-star objective engine. | 📋 **Planned** |
+| **Local Multiplayer** | [`local_multiplayer/`](./local_multiplayer/) | Hotseat Pass & Play privacy curtain state machine and dual-gamepad hardware input router. | 📋 **Planned** |
+| **Settings Vault** | [`settings_vault/`](./settings_vault/) | Audio bus sync, display modes (fullscreen/windowed), VSync, and preference serialization. | 📋 **Planned** |
+| **Gamepad Navigator** | [`gamepad_navigator/`](./gamepad_navigator/) | Universal UI focus graph, virtual D-pad cursor snapping, and dynamic controller prompt glyphs. | 📋 **Planned (Later)** |
 
 ---
 
