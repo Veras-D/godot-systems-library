@@ -19,14 +19,15 @@ static func evaluate_condition(condition: Dictionary, stats: Dictionary) -> bool
 	if require_win and not bool(stats.get("won", false)):
 		return false
 
-	var cond_id = str(condition.get("id", condition.get("type", ""))).strip_edges()
+	var cond_id = str(condition.get("id", condition.get("ID", condition.get("type", "")))).strip_edges()
 
 	# 1. Direct Rule: JustWin
 	if cond_id == "JustWin":
 		return bool(stats.get("won", false))
 
 	# 2. Turn Limits (FastWin)
-	var max_turns = int(condition.get("max_turns", condition.get("MaxTurns", 0)))
+	var raw_turns = str(condition.get("max_turns", condition.get("MaxTurns", ""))).strip_edges()
+	var max_turns = int(raw_turns) if raw_turns.is_valid_int() else 0
 	if max_turns <= 0 and cond_id.begins_with("FastWin"):
 		var suffix = cond_id.replace("FastWin", "")
 		if suffix.is_valid_int():
@@ -37,7 +38,8 @@ static func evaluate_condition(condition: Dictionary, stats: Dictionary) -> bool
 			return false
 
 	# 3. Maximum HP Lost
-	var max_hp = int(condition.get("max_hp_lost", condition.get("MaxHPLost", -1)))
+	var raw_hp = str(condition.get("max_hp_lost", condition.get("MaxHPLost", ""))).strip_edges()
+	var max_hp = int(raw_hp) if raw_hp.is_valid_int() else -1
 	if max_hp < 0 and cond_id.begins_with("Only") and cond_id.ends_with("HP"):
 		var num_str = cond_id.replace("Only", "").replace("HP", "")
 		if num_str.is_valid_int():
@@ -48,7 +50,8 @@ static func evaluate_condition(condition: Dictionary, stats: Dictionary) -> bool
 			return false
 
 	# 4. Maximum Friendly Creatures Lost
-	var max_creatures_lost = int(condition.get("max_creatures_lost", condition.get("MaxNumCreaturesLost", -1)))
+	var raw_c = str(condition.get("max_creatures_lost", condition.get("MaxNumCreaturesLost", ""))).strip_edges()
+	var max_creatures_lost = int(raw_c) if raw_c.is_valid_int() else -1
 	if max_creatures_lost < 0 and cond_id.begins_with("OnlyLose") and cond_id.ends_with("Creatures"):
 		var num_str = cond_id.replace("OnlyLose", "").replace("Creatures", "")
 		if num_str.is_valid_int():
@@ -59,7 +62,8 @@ static func evaluate_condition(condition: Dictionary, stats: Dictionary) -> bool
 			return false
 
 	# 5. Minimum Enemy Creatures Defeated
-	var min_defeated = int(condition.get("min_creatures_defeated", condition.get("MinCreaturesDefeated", 0)))
+	var raw_def = str(condition.get("min_creatures_defeated", condition.get("MinCreaturesDefeated", ""))).strip_edges()
+	var min_defeated = int(raw_def) if raw_def.is_valid_int() else 0
 	if min_defeated <= 0 and cond_id.begins_with("Defeat"):
 		var num_str = cond_id.replace("Defeat", "")
 		if num_str.is_valid_int():
@@ -74,7 +78,8 @@ static func evaluate_condition(condition: Dictionary, stats: Dictionary) -> bool
 			return false
 
 	# 6. Minimum Landscapes Used
-	var min_lands = int(condition.get("min_landscapes", condition.get("MinLandscapesUsed", 0)))
+	var raw_lands = str(condition.get("min_landscapes", condition.get("MinLandscapesUsed", ""))).strip_edges()
+	var min_lands = int(raw_lands) if raw_lands.is_valid_int() else 0
 	if min_lands <= 0 and cond_id.begins_with("Landscapes_"):
 		var suffix = cond_id.replace("Landscapes_", "").to_lower()
 		match suffix:
@@ -87,7 +92,8 @@ static func evaluate_condition(condition: Dictionary, stats: Dictionary) -> bool
 			return false
 
 	# 7. Maximum Deck Cost
-	var max_deck_cost = int(condition.get("max_deck_cost", condition.get("MaxDeckCost", 0)))
+	var raw_cost = str(condition.get("max_deck_cost", condition.get("MaxDeckCost", ""))).strip_edges()
+	var max_deck_cost = int(raw_cost) if raw_cost.is_valid_int() else 0
 	if max_deck_cost <= 0 and cond_id.begins_with("MaxCost"):
 		var num_str = cond_id.replace("MaxCost", "")
 		if num_str.is_valid_int():

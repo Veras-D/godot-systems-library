@@ -47,6 +47,10 @@ func add_node(node_data: Dictionary) -> bool:
 	var prereqs: Array[String] = []
 	for p in node_data.get("prerequisites", []):
 		prereqs.append(str(p).strip_edges())
+	if _incoming_edges.has(nid):
+		for source_id in _incoming_edges[nid]:
+			if not prereqs.has(str(source_id)):
+				prereqs.append(str(source_id))
 
 	var conns: Array[String] = []
 	for c in node_data.get("connections", []):
