@@ -1,0 +1,136 @@
+[gd_scene load_steps=3 format=3 uid="uid://testbed_local_multiplayer_001"]
+
+[ext_resource type="Script" path="res://local_multiplayer/TestbedLocalMultiplayer.gd" id="1_testbed"]
+[ext_resource type="Script" path="res://local_multiplayer/HotseatCurtain.gd" id="2_curtain"]
+
+[node name="TestbedLocalMultiplayer" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_testbed")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 30.0
+offset_top = 20.0
+offset_right = -30.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="Header" type="VBoxContainer" parent="VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="VBox/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "🎮 SYS-10: Local Multiplayer & Gamepad Testbed"
+horizontal_alignment = 1
+
+[node name="TurnIndicator" type="Label" parent="VBox/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "TURN 1 — Active: Player 1"
+horizontal_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="VBox/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.75, 0.85, 1)
+theme_override_font_sizes/font_size = 14
+text = "Ready."
+horizontal_alignment = 1
+
+[node name="ModeButton" type="OptionButton" parent="VBox/Header"]
+custom_minimum_size = Vector2(280, 36)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="LanesArea" type="HBoxContainer" parent="VBox"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Lane1" type="Button" parent="VBox/LanesArea"]
+custom_minimum_size = Vector2(140, 90)
+layout_mode = 2
+text = "Lane 1 (Plains)"
+
+[node name="Lane2" type="Button" parent="VBox/LanesArea"]
+custom_minimum_size = Vector2(140, 90)
+layout_mode = 2
+text = "Lane 2 (Plains)"
+
+[node name="Lane3" type="Button" parent="VBox/LanesArea"]
+custom_minimum_size = Vector2(140, 90)
+layout_mode = 2
+text = "Lane 3 (Cotton)"
+
+[node name="Lane4" type="Button" parent="VBox/LanesArea"]
+custom_minimum_size = Vector2(140, 90)
+layout_mode = 2
+text = "Lane 4 (Plains)"
+
+[node name="P1Area" type="VBoxContainer" parent="VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HandContainer" type="HBoxContainer" parent="VBox/P1Area"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="Card1" type="Button" parent="VBox/P1Area/HandContainer"]
+custom_minimum_size = Vector2(120, 70)
+layout_mode = 2
+text = "Card 1"
+
+[node name="Card2" type="Button" parent="VBox/P1Area/HandContainer"]
+custom_minimum_size = Vector2(120, 70)
+layout_mode = 2
+text = "Card 2"
+
+[node name="Card3" type="Button" parent="VBox/P1Area/HandContainer"]
+custom_minimum_size = Vector2(120, 70)
+layout_mode = 2
+text = "Card 3"
+
+[node name="Card4" type="Button" parent="VBox/P1Area/HandContainer"]
+custom_minimum_size = Vector2(120, 70)
+layout_mode = 2
+text = "Card 4"
+
+[node name="Controls" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="EndTurnBtn" type="Button" parent="VBox/Controls"]
+custom_minimum_size = Vector2(180, 44)
+layout_mode = 2
+text = "End Turn (Pass) ➔"
+
+[node name="GlyphLabel" type="Label" parent="VBox/Controls"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.85, 0.85, 1)
+theme_override_font_sizes/font_size = 14
+text = "Controls: [A] Select • [RB] End Turn"
+
+[node name="HotseatCurtain" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_curtain")
