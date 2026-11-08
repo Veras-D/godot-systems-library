@@ -50,7 +50,8 @@ func focus_zone(zone: FocusZone, index: int = 0) -> bool:
 
 	var node: Control = list[current_index]
 	if is_instance_valid(node):
-		node.grab_focus()
+		if node.is_inside_tree():
+			node.grab_focus()
 		focus_changed.emit(current_zone, current_index, node)
 		return true
 	return false

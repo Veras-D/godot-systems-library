@@ -1,0 +1,174 @@
+[gd_scene load_steps=5 format=3 uid="uid://testbed_network_multiplayer_001"]
+
+[ext_resource type="Script" path="res://network_multiplayer/TestbedNetworkMultiplayer.gd" id="1_testbed"]
+[ext_resource type="Script" path="res://network_multiplayer/LanDiscovery.gd" id="2_discovery"]
+[ext_resource type="Script" path="res://network_multiplayer/NetworkSessionManager.gd" id="3_session"]
+[ext_resource type="Script" path="res://network_multiplayer/TurnActionProtocol.gd" id="4_protocol"]
+
+[node name="TestbedNetworkMultiplayer" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_testbed")
+
+[node name="LanDiscovery" type="Node" parent="."]
+script = ExtResource("2_discovery")
+
+[node name="NetworkSessionManager" type="Node" parent="."]
+script = ExtResource("3_session")
+
+[node name="TurnActionProtocol" type="Node" parent="."]
+script = ExtResource("4_protocol")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 30.0
+offset_top = 20.0
+offset_right = -30.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 15
+
+[node name="Header" type="VBoxContainer" parent="VBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="VBox/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "🌐 SYS-11: Network Multiplayer & LAN Discovery Testbed"
+horizontal_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="VBox/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "Status: Offline"
+horizontal_alignment = 1
+
+[node name="ConnectionBar" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PortLabel" type="Label" parent="VBox/ConnectionBar"]
+layout_mode = 2
+text = "Port:"
+
+[node name="PortInput" type="LineEdit" parent="VBox/ConnectionBar"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(80, 0)
+text = "8910"
+
+[node name="HostBtn" type="Button" parent="VBox/ConnectionBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "📡 Host LAN Match"
+
+[node name="ScanBtn" type="Button" parent="VBox/ConnectionBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "🔍 Scan LAN"
+
+[node name="VSeparator" type="VSeparator" parent="VBox/ConnectionBar"]
+layout_mode = 2
+
+[node name="IpLabel" type="Label" parent="VBox/ConnectionBar"]
+layout_mode = 2
+text = "Direct IP:"
+
+[node name="IpInput" type="LineEdit" parent="VBox/ConnectionBar"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(150, 0)
+text = "127.0.0.1"
+
+[node name="DirectConnectBtn" type="Button" parent="VBox/ConnectionBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Direct Connect"
+
+[node name="DisconnectBtn" type="Button" parent="VBox/ConnectionBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Disconnect"
+
+[node name="ContentSplit" type="HSplitContainer" parent="VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LeftBox" type="VBoxContainer" parent="VBox/ContentSplit"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.8
+
+[node name="LobbyTitle" type="Label" parent="VBox/ContentSplit/LeftBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Discovered LAN Lobbies:"
+
+[node name="ServerList" type="ItemList" parent="VBox/ContentSplit/LeftBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="RightBox" type="VBoxContainer" parent="VBox/ContentSplit"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.2
+theme_override_constants/separation = 10
+
+[node name="ActionPanel" type="PanelContainer" parent="VBox/ContentSplit/RightBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ActionBox" type="VBoxContainer" parent="VBox/ContentSplit/RightBox/ActionPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ActionHeader" type="Label" parent="VBox/ContentSplit/RightBox/ActionPanel/ActionBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Turn Action Testing (RPC):"
+
+[node name="BtnGrid" type="HBoxContainer" parent="VBox/ContentSplit/RightBox/ActionPanel/ActionBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="PlayCardBtn" type="Button" parent="VBox/ContentSplit/RightBox/ActionPanel/ActionBox/BtnGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "🃏 Play Card"
+
+[node name="FloopBtn" type="Button" parent="VBox/ContentSplit/RightBox/ActionPanel/ActionBox/BtnGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "🌀 Floop Lane 0"
+
+[node name="LeaderBtn" type="Button" parent="VBox/ContentSplit/RightBox/ActionPanel/ActionBox/BtnGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "👑 Leader Power"
+
+[node name="EndTurnBtn" type="Button" parent="VBox/ContentSplit/RightBox/ActionPanel/ActionBox/BtnGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "⏭ End Turn"
+
+[node name="LogLabel" type="Label" parent="VBox/ContentSplit/RightBox"]
+layout_mode = 2
+text = "Activity Log:"
+
+[node name="LogText" type="RichTextLabel" parent="VBox/ContentSplit/RightBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+scroll_following = true
