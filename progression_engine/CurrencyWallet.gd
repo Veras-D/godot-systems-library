@@ -41,6 +41,22 @@ func get_balance(currency_id: String) -> int:
 	return int(_balances.get(currency_id, 0))
 
 
+## Sets the balance of a currency, clamping between 0 and max_cap (if capped).
+## Emits balance_changed signal. Returns the new balance.
+func set_balance(currency_id: String, amount: int) -> int:
+	var cid = currency_id.strip_edges().to_lower()
+	if not _balances.has(cid):
+		return 0
+	var cap = int(_caps.get(cid, -1))
+	var clamped = maxi(0, amount)
+	if cap >= 0:
+		clamped = mini(clamped, cap)
+	var prev = int(_balances[cid])
+	_balances[cid] = clamped
+	balance_changed.emit(cid, clamped, clamped - prev)
+	return clamped
+
+
 ## Returns the maximum cap for a currency (-1 if uncapped or not registered).
 func get_cap(currency_id: String) -> int:
 	return int(_caps.get(currency_id, -1))
