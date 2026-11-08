@@ -1,0 +1,257 @@
+[gd_scene load_steps=3 format=3 uid="uid://testbed_settings_001"]
+
+[ext_resource type="Script" path="res://settings_vault/TestbedSettings.gd" id="1_testbed"]
+[ext_resource type="Script" path="res://settings_vault/SettingsManager.gd" id="2_manager"]
+
+[node name="TestbedSettings" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_testbed")
+
+[node name="SettingsManager" type="Node" parent="."]
+script = ExtResource("2_manager")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = 24.0
+offset_right = -40.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="Header" type="VBoxContainer" parent="VBox"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="VBox/Header"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "⚙️ SYS-12: Settings Vault Testbed"
+horizontal_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="VBox/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
+text = "Ready."
+horizontal_alignment = 1
+
+[node name="TabContainer" type="TabContainer" parent="VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Audio" type="TabBar" parent="VBox/TabContainer"]
+layout_mode = 2
+
+[node name="AudioGrid" type="GridContainer" parent="VBox/TabContainer/Audio"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 16
+columns = 4
+
+[node name="MasterName" type="Label" parent="VBox/TabContainer/Audio/AudioGrid"]
+layout_mode = 2
+text = "Master Volume:"
+
+[node name="MasterSlider" type="HSlider" parent="VBox/TabContainer/Audio/AudioGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.05
+value = 0.8
+
+[node name="MasterLabel" type="Label" parent="VBox/TabContainer/Audio/AudioGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "80%"
+
+[node name="MasterMuteCheck" type="CheckBox" parent="VBox/TabContainer/Audio/AudioGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Mute"
+
+[node name="BgmName" type="Label" parent="VBox/TabContainer/Audio/AudioGrid"]
+layout_mode = 2
+text = "Music (BGM):"
+
+[node name="BgmSlider" type="HSlider" parent="VBox/TabContainer/Audio/AudioGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.05
+value = 0.8
+
+[node name="BgmLabel" type="Label" parent="VBox/TabContainer/Audio/AudioGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "80%"
+
+[node name="BgmMuteCheck" type="CheckBox" parent="VBox/TabContainer/Audio/AudioGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Mute"
+
+[node name="SfxName" type="Label" parent="VBox/TabContainer/Audio/AudioGrid"]
+layout_mode = 2
+text = "Sound Effects (SFX):"
+
+[node name="SfxSlider" type="HSlider" parent="VBox/TabContainer/Audio/AudioGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.05
+value = 0.85
+
+[node name="SfxLabel" type="Label" parent="VBox/TabContainer/Audio/AudioGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "85%"
+
+[node name="SfxMuteCheck" type="CheckBox" parent="VBox/TabContainer/Audio/AudioGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Mute"
+
+[node name="VoName" type="Label" parent="VBox/TabContainer/Audio/AudioGrid"]
+layout_mode = 2
+text = "Voice Over (VO):"
+
+[node name="VoSlider" type="HSlider" parent="VBox/TabContainer/Audio/AudioGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.05
+value = 0.9
+
+[node name="VoLabel" type="Label" parent="VBox/TabContainer/Audio/AudioGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "90%"
+
+[node name="VoMuteCheck" type="CheckBox" parent="VBox/TabContainer/Audio/AudioGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Mute"
+
+[node name="Display" type="TabBar" parent="VBox/TabContainer"]
+visible = false
+layout_mode = 2
+
+[node name="DisplayGrid" type="GridContainer" parent="VBox/TabContainer/Display"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 16
+columns = 2
+
+[node name="ModeLabel" type="Label" parent="VBox/TabContainer/Display/DisplayGrid"]
+layout_mode = 2
+text = "Window Mode:"
+
+[node name="ModeOption" type="OptionButton" parent="VBox/TabContainer/Display/DisplayGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ResLabel" type="Label" parent="VBox/TabContainer/Display/DisplayGrid"]
+layout_mode = 2
+text = "Resolution:"
+
+[node name="ResOption" type="OptionButton" parent="VBox/TabContainer/Display/DisplayGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VsyncLabel" type="Label" parent="VBox/TabContainer/Display/DisplayGrid"]
+layout_mode = 2
+text = "V-Sync:"
+
+[node name="VsyncOption" type="OptionButton" parent="VBox/TabContainer/Display/DisplayGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FpsLabel" type="Label" parent="VBox/TabContainer/Display/DisplayGrid"]
+layout_mode = 2
+text = "Target Framerate (FPS):"
+
+[node name="FpsOption" type="OptionButton" parent="VBox/TabContainer/Display/DisplayGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ScaleNameLabel" type="Label" parent="VBox/TabContainer/Display/DisplayGrid"]
+layout_mode = 2
+text = "UI Scale:"
+
+[node name="ScaleBox" type="HBoxContainer" parent="VBox/TabContainer/Display/DisplayGrid"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ScaleSlider" type="HSlider" parent="VBox/TabContainer/Display/DisplayGrid/ScaleBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.75
+max_value = 2.0
+step = 0.25
+value = 1.0
+
+[node name="ScaleLabel" type="Label" parent="VBox/TabContainer/Display/DisplayGrid/ScaleBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+text = "1.00x"
+
+[node name="ActionBar" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 2
+
+[node name="ResetBtn" type="Button" parent="VBox/ActionBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "🔄 Reset to Defaults"
+
+[node name="LoadBtn" type="Button" parent="VBox/ActionBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "📂 Load Settings"
+
+[node name="SaveBtn" type="Button" parent="VBox/ActionBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "💾 Save Settings"
