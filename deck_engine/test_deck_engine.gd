@@ -139,5 +139,49 @@ func _init() -> void:
 	test_view.queue_free()
 	print("GenericCardView card_data setter UI re-rendering verified.")
 
+	# 6. Test DeckRulesValidator
+	var DeckRulesValidator = preload("DeckRulesValidator.gd")
+	var validator = DeckRulesValidator.new(10, 25, 4)
+
+	# Test Deck validation (too small)
+	var small_deck = ["c1", "c2", "c3"]
+	var v_small = validator.validate_deck(small_deck)
+	assert(not v_small["valid"], "Deck under 10 cards must be invalid")
+
+	# Test Duplicate limit
+	var dup_deck = ["c1", "c1", "c1", "c1", "c1", "c2", "c3", "c4", "c5", "c6"]
+	var v_dup = validator.validate_deck(dup_deck)
+	assert(not v_dup["valid"], "Deck with > 4 copies must be invalid")
+
+	# Test Valid deck
+	var legal_deck = []
+	for i in range(15):
+		legal_deck.append("card_%d" % i)
+	var v_legal = validator.validate_deck(legal_deck)
+	assert(v_legal["valid"], "Deck of 15 unique cards must be valid")
+
+	# Test Mana curve histogram
+	var curve_cards = [
+		{ "cost": 0 }, { "cost": 1 }, { "cost": 1 }, { "cost": 2 },
+		{ "cost": 3 }, { "cost": 5 }, { "cost": 8 }
+	]
+	var curve = DeckRulesValidator.compute_cost_curve(curve_cards, 5)
+	assert(curve[0] == 1, "Cost 0 count should be 1")
+	assert(curve[1] == 2, "Cost 1 count should be 2")
+	assert(curve[2] == 1, "Cost 2 count should be 1")
+	assert(curve[5] == 2, "Cost 5+ (5 and 8) grouped into bucket 5 should be 2")
+
+	# Test Card filtering
+	var all_cards = [
+		{ "id": "card_01", "name": "Fire Imp", "faction": "Fire", "type": "Creature", "cost": 1 },
+		{ "id": "card_02", "name": "Water Elemental", "faction": "Water", "type": "Creature", "cost": 3 },
+		{ "id": "card_03", "name": "Fireball", "faction": "Fire", "type": "Spell", "cost": 2 }
+	]
+	var fire_cards = DeckRulesValidator.filter_cards(all_cards, { "faction": "FIRE" })
+	assert(fire_cards.size() == 2, "Filtering by faction Fire should return 2 cards")
+	var spell_cards = DeckRulesValidator.filter_cards(all_cards, { "type": "SPELL" })
+	assert(spell_cards.size() == 1, "Filtering by type Spell should return 1 card")
+	print("DeckRulesValidator constraints, curve, and filtering verified.")
+
 	print("==> All DeckEngine Unit & Regression Tests PASSED!")
 	quit(0)

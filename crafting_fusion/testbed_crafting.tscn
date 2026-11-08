@@ -1,0 +1,186 @@
+[gd_scene load_steps=3 format=3 uid="uid://tbcf001"]
+
+[ext_resource type="Script" path="TestbedCrafting.gd" id="1_script"]
+[ext_resource type="Theme" path="res://testbed_theme.tres" id="2_theme"]
+
+[node name="TestbedCrafting" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.09, 0.13, 1)
+
+[node name="Layout" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 24
+
+[node name="MainArea" type="VBoxContainer" parent="Layout"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="Header" type="VBoxContainer" parent="Layout/MainArea"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Layout/MainArea/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.85, 0.35, 1)
+theme_override_font_sizes/font_size = 22
+text = "Universal Crafting & Quality Engine"
+
+[node name="Subtitle" type="Label" parent="Layout/MainArea/Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.7, 0.85, 1)
+theme_override_font_sizes/font_size = 13
+text = "Godot Modular Systems Library — Standalone Module: crafting_fusion/"
+
+[node name="Content" type="HBoxContainer" parent="Layout/MainArea"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="Left" type="VBoxContainer" parent="Layout/MainArea/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="RecipeLabel" type="Label" parent="Layout/MainArea/Content/Left"]
+layout_mode = 2
+text = "Select Recipe:"
+
+[node name="RecipePicker" type="OptionButton" parent="Layout/MainArea/Content/Left"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+
+[node name="ReqLabel" type="Label" parent="Layout/MainArea/Content/Left"]
+layout_mode = 2
+text = "Recipe Requirements:"
+
+[node name="DetailsPanel" type="PanelContainer" parent="Layout/MainArea/Content/Left"]
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="Layout/MainArea/Content/Left/DetailsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="DetailsBox" type="VBoxContainer" parent="Layout/MainArea/Content/Left"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="StatsPreview" type="Label" parent="Layout/MainArea/Content/Left"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 1, 1)
+text = "Stat Scaling Preview"
+
+[node name="CraftButton" type="Button" parent="Layout/MainArea/Content/Left"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "⚒ Craft Item"
+
+[node name="StatusLabel" type="Label" parent="Layout/MainArea/Content/Left"]
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="Sidebar" type="VBoxContainer" parent="Layout"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="CurrencyBox" type="HBoxContainer" parent="Layout/Sidebar"]
+layout_mode = 2
+
+[node name="CurrencyTitle" type="Label" parent="Layout/Sidebar/CurrencyBox"]
+layout_mode = 2
+text = "Wallet: "
+
+[node name="CurrencyValue" type="Label" parent="Layout/Sidebar/CurrencyBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+text = "200 Gold"
+
+[node name="CurrencyButtons" type="HBoxContainer" parent="Layout/Sidebar"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Add50" type="Button" parent="Layout/Sidebar/CurrencyButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "+50 G"
+
+[node name="Add250" type="Button" parent="Layout/Sidebar/CurrencyButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "+250 G"
+
+[node name="InvLabel" type="Label" parent="Layout/Sidebar"]
+layout_mode = 2
+text = "Player Inventory:"
+
+[node name="InventoryList" type="ItemList" parent="Layout/Sidebar"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="AddIngredientsLabel" type="Label" parent="Layout/Sidebar"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+text = "Quick Add Items:"
+
+[node name="AddItemsGrid" type="GridContainer" parent="Layout/Sidebar"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+
+[node name="AddSword" type="Button" parent="Layout/Sidebar/AddItemsGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "+1 Sword"
+
+[node name="AddFlameCore" type="Button" parent="Layout/Sidebar/AddItemsGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "+1 Flame Core"
+
+[node name="AddVoidShard" type="Button" parent="Layout/Sidebar/AddItemsGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "+1 Void Shard"
+
+[node name="AddSunHerb" type="Button" parent="Layout/Sidebar/AddItemsGrid"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "+1 Sun Herb"
+
+[connection signal="pressed" from="Layout/MainArea/Content/Left/CraftButton" to="." method="_on_craft_button_pressed"]
+[connection signal="pressed" from="Layout/Sidebar/CurrencyButtons/Add50" to="." method="_on_add_currency_pressed" binds= [50]]
+[connection signal="pressed" from="Layout/Sidebar/CurrencyButtons/Add250" to="." method="_on_add_currency_pressed" binds= [250]]
+[connection signal="pressed" from="Layout/Sidebar/AddItemsGrid/AddSword" to="." method="_on_add_ingredient_pressed" binds= ["Iron Sword", 1]]
+[connection signal="pressed" from="Layout/Sidebar/AddItemsGrid/AddFlameCore" to="." method="_on_add_ingredient_pressed" binds= ["Flame Core", 1]]
+[connection signal="pressed" from="Layout/Sidebar/AddItemsGrid/AddVoidShard" to="." method="_on_add_ingredient_pressed" binds= ["Void Shard", 1]]
+[connection signal="pressed" from="Layout/Sidebar/AddItemsGrid/AddSunHerb" to="." method="_on_add_ingredient_pressed" binds= ["Sun Herb", 1]]
