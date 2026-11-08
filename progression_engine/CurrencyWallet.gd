@@ -53,7 +53,7 @@ func set_balance(currency_id: String, amount: int) -> int:
 		clamped = mini(clamped, cap)
 	var prev = int(_balances[cid])
 	_balances[cid] = clamped
-	balance_changed.emit(cid, clamped, clamped - prev)
+	balance_changed.emit(cid, prev, clamped)
 	return clamped
 
 
