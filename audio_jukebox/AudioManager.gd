@@ -134,6 +134,9 @@ func play_bgm(stream: AudioStream, crossfade_sec: float = -1.0) -> void:
 
 	if stream is AudioStreamWAV:
 		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		if stream.loop_end <= stream.loop_begin:
+			stream.loop_begin = 0
+			stream.loop_end = int(stream.get_length() * stream.mix_rate)
 	elif stream is AudioStreamOggVorbis:
 		stream.loop = true
 
