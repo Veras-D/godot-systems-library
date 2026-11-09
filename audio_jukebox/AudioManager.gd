@@ -88,15 +88,21 @@ func _setup_bgm_players() -> void:
 	_bgm_a = AudioStreamPlayer.new()
 	_bgm_a.name = "BGM_A"
 	_bgm_a.bus = _bus_music_name
+	_bgm_a.finished.connect(_on_bgm_finished.bind(_bgm_a))
 	add_child(_bgm_a)
 
 	_bgm_b = AudioStreamPlayer.new()
 	_bgm_b.name = "BGM_B"
 	_bgm_b.bus = _bus_music_name
+	_bgm_b.finished.connect(_on_bgm_finished.bind(_bgm_b))
 	add_child(_bgm_b)
 
 	_active_bgm = _bgm_a
 	_inactive_bgm = _bgm_b
+
+func _on_bgm_finished(player: AudioStreamPlayer) -> void:
+	if player == _active_bgm and player.stream != null:
+		player.play()
 
 func _setup_sfx_pool() -> void:
 	for i in range(sfx_pool_size):
@@ -125,6 +131,11 @@ func play_bgm(stream: AudioStream, crossfade_sec: float = -1.0) -> void:
 	if stream == null:
 		stop_bgm(crossfade_sec)
 		return
+
+	if stream is AudioStreamWAV:
+		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	elif stream is AudioStreamOggVorbis:
+		stream.loop = true
 
 	if _active_bgm.stream == stream and _active_bgm.playing:
 		return
