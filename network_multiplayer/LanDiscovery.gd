@@ -129,7 +129,7 @@ func _receive_packets() -> void:
 			var g_port = int(parsed.get("game_port", 8910))
 			var now = Time.get_ticks_msec() / 1000.0
 
-			var is_new = not _discovered_servers.has(sender_ip)
+			var _is_new = not _discovered_servers.has(sender_ip)
 			_discovered_servers[sender_ip] = {
 				"ip": sender_ip,
 				"game_port": g_port,
