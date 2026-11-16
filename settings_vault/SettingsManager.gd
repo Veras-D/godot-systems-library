@@ -71,6 +71,33 @@ func _backup_default_keybindings() -> void:
 # AUDIO BUS SETTINGS
 # ==============================================================================
 
+## Generic bus name aliases so "BGM"/"Music" and "VO"/"Voice" map reliably to AudioServer.
+const BUS_ALIASES: Dictionary = {
+	"BGM": "Music",
+	"Music": "BGM",
+	"VO": "Voice",
+	"Voice": "VO",
+}
+
+
+func _resolve_audio_bus_index(bus_name: String) -> int:
+	var idx := AudioServer.get_bus_index(bus_name)
+	if idx >= 0:
+		return idx
+	if BUS_ALIASES.has(bus_name):
+		return AudioServer.get_bus_index(str(BUS_ALIASES[bus_name]))
+	return -1
+
+
+## Applies all current audio_settings directly to AudioServer buses.
+func apply_audio_settings() -> void:
+	for bus_name in audio_settings.keys():
+		var data = audio_settings[bus_name]
+		if data is Dictionary:
+			set_bus_volume(str(bus_name), float(data.get("volume", 0.8)))
+			set_bus_mute(str(bus_name), bool(data.get("muted", false)))
+
+
 ## Sets audio bus volume linearly [0.0 - 1.0] and applies decibels to AudioServer.
 func set_bus_volume(bus_name: String, linear_volume: float) -> void:
 	linear_volume = clampf(linear_volume, 0.0, 1.0)
@@ -78,16 +105,16 @@ func set_bus_volume(bus_name: String, linear_volume: float) -> void:
 	bus_data["volume"] = linear_volume
 	audio_settings[bus_name] = bus_data
 
-	var bus_idx = AudioServer.get_bus_index(bus_name)
+	var bus_idx := _resolve_audio_bus_index(bus_name)
 	if bus_idx >= 0:
-		if linear_volume <= 0.001 or bus_data.get("muted", false):
+		if linear_volume <= 0.001 or bool(bus_data.get("muted", false)):
 			AudioServer.set_bus_mute(bus_idx, true)
+			AudioServer.set_bus_volume_db(bus_idx, -80.0 if linear_volume <= 0.001 else linear_to_db(linear_volume))
 		else:
 			AudioServer.set_bus_mute(bus_idx, false)
-			var db_vol = linear_to_db(linear_volume)
-			AudioServer.set_bus_volume_db(bus_idx, db_vol)
+			AudioServer.set_bus_volume_db(bus_idx, linear_to_db(linear_volume))
 
-	audio_setting_changed.emit(bus_name, linear_volume, bus_data.get("muted", false))
+	audio_setting_changed.emit(bus_name, linear_volume, bool(bus_data.get("muted", false)))
 
 
 func set_bus_mute(bus_name: String, is_muted: bool) -> void:
@@ -95,11 +122,14 @@ func set_bus_mute(bus_name: String, is_muted: bool) -> void:
 	bus_data["muted"] = is_muted
 	audio_settings[bus_name] = bus_data
 
-	var bus_idx = AudioServer.get_bus_index(bus_name)
+	var vol := float(bus_data.get("volume", 0.8))
+	var bus_idx := _resolve_audio_bus_index(bus_name)
 	if bus_idx >= 0:
-		AudioServer.set_bus_mute(bus_idx, is_muted or float(bus_data.get("volume", 0.8)) <= 0.001)
+		AudioServer.set_bus_mute(bus_idx, is_muted or vol <= 0.001)
+		if not is_muted and vol > 0.001:
+			AudioServer.set_bus_volume_db(bus_idx, linear_to_db(vol))
 
-	audio_setting_changed.emit(bus_name, float(bus_data.get("volume", 0.8)), is_muted)
+	audio_setting_changed.emit(bus_name, vol, is_muted)
 
 
 func get_bus_volume(bus_name: String) -> float:
@@ -157,6 +187,8 @@ func set_target_fps(fps: int) -> void:
 func set_ui_scale(scale_factor: float) -> void:
 	scale_factor = clampf(scale_factor, 0.5, 3.0)
 	display_settings["ui_scale"] = scale_factor
+	if is_inside_tree() and get_tree() and get_tree().root:
+		get_tree().root.content_scale_factor = scale_factor
 	display_setting_changed.emit("ui_scale", scale_factor)
 
 
@@ -208,6 +240,7 @@ func save_settings(path: String = "") -> bool:
 		"version": 1,
 		"audio": audio_settings,
 		"display": {
+			"language": display_settings.get("language", "en"),
 			"window_mode": display_settings["window_mode"],
 			"res_x": display_settings["resolution"].x,
 			"res_y": display_settings["resolution"].y,
@@ -263,6 +296,8 @@ func load_settings(path: String = "") -> bool:
 	# 2. Apply Display
 	if parsed.has("display") and parsed["display"] is Dictionary:
 		var d = parsed["display"]
+		if d.has("language"):
+			display_settings["language"] = str(d["language"])
 		if d.has("window_mode"):
 			set_window_mode(int(d["window_mode"]))
 		if d.has("res_x") and d.has("res_y"):
@@ -296,6 +331,7 @@ func reset_to_defaults() -> void:
 		set_bus_volume(bus, 0.85)
 		set_bus_mute(bus, false)
 
+	display_settings["language"] = "en"
 	set_window_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 	set_resolution(Vector2i(1280, 720))
 	set_vsync_mode(DisplayServer.VSYNC_ENABLED)
