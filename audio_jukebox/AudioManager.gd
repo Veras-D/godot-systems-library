@@ -41,6 +41,17 @@ func _ready() -> void:
 	if _voice_player == null:
 		_setup_voice_player()
 
+
+func _exit_tree() -> void:
+	for p in [_bgm_a, _bgm_b, _voice_player]:
+		if p != null:
+			p.stop()
+			p.stream = null
+	for sp in _sfx_pool:
+		if sp != null:
+			sp.stop()
+			sp.stream = null
+
 func _setup_buses() -> void:
 	# Check if dedicated buses exist; if not, create them or fall back to Master
 	if AudioServer.get_bus_index("Music") != -1:

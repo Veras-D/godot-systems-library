@@ -11,6 +11,7 @@ enum State { IDLE, SPINNING, STOPPING, RESOLVED }
 
 @export var radius: float = 110.0
 @export var show_labels: bool = true
+@export var custom_rim: bool = false
 
 var config: WheelConfig = null
 var state: State = State.IDLE
@@ -134,8 +135,9 @@ func _draw() -> void:
 		return
 
 	# 1. Draw outer shadow ring
-	draw_circle(center, radius + 8.0, Color(0.05, 0.05, 0.08, 0.8))
-	draw_circle(center, radius + 4.0, Color(0.85, 0.70, 0.25, 1.0)) # Gold outer rim
+	if not custom_rim:
+		draw_circle(center, radius + 8.0, Color(0.05, 0.05, 0.08, 0.8))
+		draw_circle(center, radius + 4.0, Color(0.85, 0.70, 0.25, 1.0)) # Gold outer rim
 
 	# 2. Draw Sectors
 	var current_deg = -90.0 # Start from top (12 o'clock)
@@ -149,31 +151,34 @@ func _draw() -> void:
 
 		# Sector boundary divider
 		var edge_pt = center + Vector2(cos(start_rad), sin(start_rad)) * radius
-		draw_line(center, edge_pt, Color(0.1, 0.1, 0.1, 0.8), 2.0, true)
+		var div_col = Color.BLACK if custom_rim else Color(0.05, 0.05, 0.05, 0.9)
+		var div_w = 3.0 if custom_rim else 2.5
+		draw_line(center, edge_pt, div_col, div_w, true)
 
 		current_deg += span_deg
 
-	# 3. Inner hub rim
-	draw_circle(center, radius * 0.25, Color(0.15, 0.18, 0.25, 1.0))
-	draw_circle(center, radius * 0.22, Color(0.85, 0.70, 0.25, 1.0))
-	draw_circle(center, radius * 0.12, Color(0.10, 0.12, 0.18, 1.0))
+	if not custom_rim:
+		# 3. Inner hub rim
+		draw_circle(center, radius * 0.25, Color(0.15, 0.18, 0.25, 1.0))
+		draw_circle(center, radius * 0.22, Color(0.85, 0.70, 0.25, 1.0))
+		draw_circle(center, radius * 0.12, Color(0.10, 0.12, 0.18, 1.0))
 
-	# 4. Needle / Pointer (pointing from center outward at current_angle_deg)
-	var needle_angle_rad = deg_to_rad(current_angle_deg - 90.0)
-	var needle_tip = center + Vector2(cos(needle_angle_rad), sin(needle_angle_rad)) * (radius + 2.0)
-	var needle_left = center + Vector2(cos(needle_angle_rad + 2.5), sin(needle_angle_rad + 2.5)) * 14.0
-	var needle_right = center + Vector2(cos(needle_angle_rad - 2.5), sin(needle_angle_rad - 2.5)) * 14.0
+		# 4. Needle / Pointer (pointing from center outward at current_angle_deg)
+		var needle_angle_rad = deg_to_rad(current_angle_deg - 90.0)
+		var needle_tip = center + Vector2(cos(needle_angle_rad), sin(needle_angle_rad)) * (radius + 2.0)
+		var needle_left = center + Vector2(cos(needle_angle_rad + 2.5), sin(needle_angle_rad + 2.5)) * 14.0
+		var needle_right = center + Vector2(cos(needle_angle_rad - 2.5), sin(needle_angle_rad - 2.5)) * 14.0
 
-	var needle_pts = PackedVector2Array([needle_tip, needle_left, needle_right])
-	# Needle shadow
-	var shadow_pts = PackedVector2Array([
-		needle_tip + Vector2(2, 2),
-		needle_left + Vector2(2, 2),
-		needle_right + Vector2(2, 2)
-	])
-	draw_polygon(shadow_pts, PackedColorArray([Color(0, 0, 0, 0.5)]))
-	draw_polygon(needle_pts, PackedColorArray([Color(1.0, 0.2, 0.2, 1.0)])) # Red needle
-	draw_polyline(needle_pts, Color.WHITE, 1.5, true)
+		var needle_pts = PackedVector2Array([needle_tip, needle_left, needle_right])
+		# Needle shadow
+		var shadow_pts = PackedVector2Array([
+			needle_tip + Vector2(2, 2),
+			needle_left + Vector2(2, 2),
+			needle_right + Vector2(2, 2)
+		])
+		draw_polygon(shadow_pts, PackedColorArray([Color(0, 0, 0, 0.5)]))
+		draw_polygon(needle_pts, PackedColorArray([Color(1.0, 0.2, 0.2, 1.0)])) # Red needle
+		draw_polyline(needle_pts, Color.WHITE, 1.5, true)
 
 func _draw_pie_slice(center: Vector2, r: float, start_rad: float, end_rad: float, color: Color) -> void:
 	var span = abs(end_rad - start_rad)
